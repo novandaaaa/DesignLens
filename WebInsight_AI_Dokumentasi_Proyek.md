@@ -1,10 +1,10 @@
-# WebInsight AI
+# DesignLens AI
 
 ## Pengembangan Platform Evaluasi UI/UX Website Berbasis Artificial Intelligence dan Community Review
 
 # 1. Cover
 
-**Nama Proyek:** WebInsight AI
+**Nama Proyek:** DesignLens AI
 
 **Judul Skripsi:** Pengembangan Platform Evaluasi UI/UX Website Berbasis
 Artificial Intelligence dan Community Review
