@@ -332,3 +332,24 @@ masukan yang lebih beragam. Dengan arsitektur modern menggunakan
 Next.js, NestJS, PostgreSQL, Prisma, Playwright, dan OpenRouter,
 platform ini memiliki ruang lingkup yang realistis untuk skripsi
 sekaligus berpotensi dikembangkan menjadi produk nyata.
+
+# Tambahan sedikit
+OpenRouter — OpenRouter menyediakan 28+ model dengan biaya $0 per token (ID model yang diakhiri :free), bisa dipakai dengan saldo $0 tanpa kartu kredit, dan model gratis ini dibatasi lewat rate limit, bukan kredit. Batasannya: cap 20 request/menit tetap berlaku meski sudah top-up, tapi top-up sekali sebesar $10 (kredit tidak kedaluwarsa) menaikkan cap harian dari 50 menjadi 1.000 request per hari. Untuk model gratisnya sendiri, pilihannya termasuk Qwen3 Coder, DeepSeek V4 Flash, Llama 3.3 70B, Google Gemma 4 31B, hingga OpenAI GPT-OSS 120B — bukan model "kaleng", beberapa memang cukup layak dipakai produksi. UsagePricingUsagePricing
+Artinya untuk tugas kuliah Anda: pakai model :free di OpenRouter itu cukup gratis dan cukup layak untuk demo/testing 2 minggu ini — asal Anda sadar rate limit-nya (20 req/menit, maks 50-1000 req/hari). Kalau demo di depan kelas dengan traffic rendah, ini realistis tidak akan kena biaya sama sekali.
+Untuk hosting (Vercel, Railway/Render, Supabase) — semuanya juga punya free tier, tapi dengan batas compute hours/bandwidth/koneksi database yang cukup untuk skala tugas kuliah (bukan produksi nyata). Jadi kesimpulannya: bisa $0 total kalau Anda pakai model :free + free tier hosting, tapi tetap ada batas rate/kuota yang perlu diperhitungkan saat demo langsung — bukan "gratis unlimited", tapi "gratis dengan pagar". Pokoknya yang gratis
+
+# Relasi kunci:
+
+WEBSITES adalah tabel pusat — terhubung ke USERS (siapa upload), CATEGORIES, SCREENSHOTS, AI_REVIEWS, dan COMMUNITY_POSTS.
+AI_REVIEWS sengaja dibuat 1-ke-1 (opsional) dengan WEBSITES — kalau nanti mau fitur "re-review" (user minta AI menilai ulang), ubah jadi 1-ke-N.
+COMMENTS punya parent_comment_id yang self-referencing ke tabel dirinya sendiri — ini yang menangani fitur "reply" berjenjang tanpa perlu tabel terpisah.
+LIKES dibuat tabel sendiri (bukan kolom counter di COMMENTS) supaya bisa cegah user like berkali-kali pada komentar yang sama (unique constraint di user_id + comment_id).
+ai_reviews.reasoning dan recommendation saya set tipe text (bukan string) karena isinya kemungkinan panjang — hasil penjelasan AI biasanya beberapa kalimat per kategori.
+
+Yang perlu Anda putuskan sendiri sebelum implementasi ke Prisma schema:
+
+Apakah reasoning disimpan sebagai satu blok teks panjang, atau JSON terstruktur per kategori (misalnya {"layout": "...", "typography": "..."}). JSON lebih fleksibel kalau nanti mau ditampilkan per-kategori di UI.
+role di tabel USERS sebaiknya pakai enum (user, admin) di level database/Prisma, bukan string bebas, supaya tidak salah ketik.
+(Itu nanti sesuaikan juga)
+
+Lalu lanjutkan dengan Schema prisma nya 
