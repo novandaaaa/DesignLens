@@ -13,8 +13,12 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET', 'designlens-secret-key'),
+        secret: configService.get<string>(
+          'JWT_SECRET',
+          'designlens-secret-key',
+        ),
         signOptions: {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           expiresIn: configService.get<string>('JWT_EXPIRES_IN', '7d') as any,
         },
       }),

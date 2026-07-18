@@ -1,5 +1,11 @@
 import {
-  Controller, Get, Post, Param, Body, Query, UseGuards,
+  Controller,
+  Get,
+  Post,
+  Param,
+  Body,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CommunityService } from './community.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
@@ -24,10 +30,7 @@ export class CommunityController {
 
   @Public()
   @Get('feed')
-  getFeed(
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-  ) {
+  getFeed(@Query('page') page?: string, @Query('limit') limit?: string) {
     return this.communityService.getFeed(
       page ? parseInt(page, 10) : 1,
       limit ? parseInt(limit, 10) : 10,

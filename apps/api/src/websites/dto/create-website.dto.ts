@@ -1,4 +1,10 @@
-import { IsString, IsUrl, IsOptional, IsUUID, MaxLength } from 'class-validator';
+import {
+  IsString,
+  IsUrl,
+  IsOptional,
+  IsUUID,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateWebsiteDto {
   @IsString()

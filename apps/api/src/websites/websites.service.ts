@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateWebsiteDto } from './dto';
 
@@ -85,7 +89,7 @@ export class WebsitesService {
 
     // AI review hanya bisa dilihat oleh owner
     if (website.aiReview && website.userId !== userId) {
-      website.aiReview = null as any;
+      website.aiReview = null;
     }
 
     return website;

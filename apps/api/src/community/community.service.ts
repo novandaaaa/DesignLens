@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -20,7 +25,9 @@ export class CommunityService {
     }
 
     if (website.communityPost?.status === 'PUBLISHED') {
-      throw new BadRequestException('Website sudah dipublikasikan ke komunitas');
+      throw new BadRequestException(
+        'Website sudah dipublikasikan ke komunitas',
+      );
     }
 
     const post = await this.prisma.communityPost.upsert({

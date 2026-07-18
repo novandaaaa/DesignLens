@@ -1,6 +1,11 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument */
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 interface AiCategoryResult {
@@ -29,7 +34,10 @@ export class AiReviewService {
     private readonly configService: ConfigService,
   ) {
     this.apiKey = this.configService.get<string>('OPENROUTER_API_KEY', '');
-    this.model = this.configService.get<string>('OPENROUTER_MODEL', 'qwen/qwen3-coder:free');
+    this.model = this.configService.get<string>(
+      'OPENROUTER_MODEL',
+      'qwen/qwen3-coder:free',
+    );
   }
 
   async createReview(websiteId: string, userId: string) {
@@ -67,7 +75,7 @@ export class AiReviewService {
         ctaScore: null,
         accessibilityScore: null,
         overallScore: null,
-        reasoning: Prisma.DbNull,
+        reasoning: null as any,
         recommendation: null,
       },
     });
@@ -76,7 +84,7 @@ export class AiReviewService {
     this.processReview(websiteId, website.url, website.description ?? '').catch(
       (error) => {
         console.error(`AI Review failed for website ${websiteId}:`, error);
-        this.prisma.aiReview.update({
+        void this.prisma.aiReview.update({
           where: { websiteId },
           data: { status: 'FAILED' },
         });
@@ -100,7 +108,9 @@ export class AiReviewService {
     }
 
     if (website.userId !== userId) {
-      throw new ForbiddenException('Hasil AI Review hanya bisa dilihat oleh pemilik website');
+      throw new ForbiddenException(
+        'Hasil AI Review hanya bisa dilihat oleh pemilik website',
+      );
     }
 
     const review = await this.prisma.aiReview.findUnique({
@@ -114,40 +124,50 @@ export class AiReviewService {
     return review;
   }
 
-  private async processReview(websiteId: string, url: string, description: string) {
+  private async processReview(
+    websiteId: string,
+    url: string,
+    description: string,
+  ) {
     if (!this.apiKey) {
       throw new Error('OPENROUTER_API_KEY not configured');
     }
 
     const prompt = this.buildPrompt(url, description);
 
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://designlens.id',
-        'X-Title': 'DesignLens AI',
+    const response = await fetch(
+      'https://openrouter.ai/api/v1/chat/completions',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://designlens.id',
+          'X-Title': 'DesignLens AI',
+        },
+        body: JSON.stringify({
+          model: this.model,
+          messages: [
+            {
+              role: 'system',
+              content:
+                'You are a professional UI/UX reviewer. Analyze websites and provide structured feedback in JSON format. Always respond with valid JSON only, no markdown formatting.',
+            },
+            {
+              role: 'user',
+              content: prompt,
+            },
+          ],
+          temperature: 0.3,
+          max_tokens: 4000,
+        }),
       },
-      body: JSON.stringify({
-        model: this.model,
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a professional UI/UX reviewer. Analyze websites and provide structured feedback in JSON format. Always respond with valid JSON only, no markdown formatting.',
-          },
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
-        temperature: 0.3,
-        max_tokens: 4000,
-      }),
-    });
+    );
 
     if (!response.ok) {
-      throw new Error(`OpenRouter API error: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `OpenRouter API error: ${response.status} ${response.statusText}`,
+      );
     }
 
     const data = await response.json();
@@ -161,8 +181,9 @@ export class AiReviewService {
     let reviewResult: AiReviewResult;
     try {
       // Try to extract JSON from the response (handle markdown code blocks)
-      const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || 
-                        content.match(/```\s*([\s\S]*?)\s*```/);
+      const jsonMatch =
+        content.match(/```json\s*([\s\S]*?)\s*```/) ||
+        content.match(/```\s*([\s\S]*?)\s*```/);
       const jsonStr = jsonMatch ? jsonMatch[1] : content;
       reviewResult = JSON.parse(jsonStr.trim());
     } catch {
@@ -178,7 +199,9 @@ export class AiReviewService {
       reviewResult.cta?.score ?? 0,
       reviewResult.accessibility?.score ?? 0,
     ];
-    const overallScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+    const overallScore = Math.round(
+      scores.reduce((a, b) => a + b, 0) / scores.length,
+    );
 
     // Update review in database
     await this.prisma.aiReview.update({
