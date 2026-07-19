@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState, use, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
@@ -48,11 +48,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     }
   }, [authLoading, isAuthenticated, router]);
 
-  useEffect(() => {
-    if (isAuthenticated) loadWebsite();
-  }, [isAuthenticated, id]);
-
-  const loadWebsite = async () => {
+  const loadWebsite = useCallback(async () => {
     try {
       const data = await api.getWebsite(id);
       setWebsite(data);
@@ -61,7 +57,26 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, router]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !id) return;
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadWebsite();
+
+    // Auto-polling jika AI sedang proses
+    let interval: NodeJS.Timeout;
+    if (website?.aiReview?.status === 'PROCESSING') {
+      interval = setInterval(() => {
+        loadWebsite();
+      }, 3000); // Poll setiap 3 detik
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isAuthenticated, id, website?.aiReview?.status, loadWebsite]);
 
   const handleTriggerAi = async () => {
     setTriggeringAi(true);

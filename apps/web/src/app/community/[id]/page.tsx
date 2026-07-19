@@ -1,13 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState, use, useCallback } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 
 export default function CommunityPostPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [post, setPost] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [comment, setComment] = useState('');
@@ -15,11 +15,7 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
   const [replyText, setReplyText] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    loadPost();
-  }, [id]);
-
-  const loadPost = async () => {
+  const loadPost = useCallback(async () => {
     try {
       const data = await api.getCommunityPost(id);
       setPost(data);
@@ -28,7 +24,12 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadPost();
+  }, [loadPost]);
 
   const handleComment = async (e: React.FormEvent) => {
     e.preventDefault();
