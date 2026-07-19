@@ -1,21 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 
 export default function CommunityPage() {
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [feed, setFeed] = useState<any>({ data: [], meta: { total: 0, page: 1, totalPages: 1 } });
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
 
-  useEffect(() => {
-    loadFeed();
-  }, [page]);
-
-  const loadFeed = async () => {
+  const loadFeed = useCallback(async () => {
     setLoading(true);
     try {
       const data = await api.getCommunityFeed(page);
@@ -25,7 +21,12 @@ export default function CommunityPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadFeed();
+  }, [loadFeed]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -102,7 +103,7 @@ export default function CommunityPage() {
                     <h3 className="text-lg font-bold text-text-primary group-hover:text-brand-400 transition-colors mb-1">
                       {post.website?.title}
                     </h3>
-                    <a className="text-sm text-brand-400">{post.website?.url}</a>
+                    <span className="text-sm text-brand-400 truncate block">{post.website?.url}</span>
 
                     {post.website?.description && (
                       <p className="text-sm text-text-secondary mt-2 line-clamp-2">{post.website.description}</p>

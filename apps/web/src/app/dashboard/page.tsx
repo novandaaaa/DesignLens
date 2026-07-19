@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
@@ -18,13 +18,7 @@ export default function DashboardPage() {
     }
   }, [authLoading, isAuthenticated, router]);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      loadWebsites();
-    }
-  }, [isAuthenticated]);
-
-  const loadWebsites = async () => {
+  const loadWebsites = useCallback(async () => {
     try {
       const data = await api.getMyWebsites();
       setWebsites(data);
@@ -33,7 +27,14 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      loadWebsites();
+    }
+  }, [isAuthenticated, loadWebsites]);
 
   if (authLoading) {
     return (

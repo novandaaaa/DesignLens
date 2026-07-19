@@ -24,6 +24,7 @@ class ApiClient {
 
     const config: RequestInit = {
       method,
+      cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
