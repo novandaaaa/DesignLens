@@ -33,8 +33,8 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center px-6 relative">
       {/* Background */}
       <div className="fixed inset-0 -z-10">
-        <div className="absolute top-[10%] right-[20%] w-[500px] h-[500px] rounded-full bg-purple-600/15 blur-[120px]" />
-        <div className="absolute bottom-[10%] left-[20%] w-[400px] h-[400px] rounded-full bg-brand-600/10 blur-[100px]" />
+        <div className="absolute top-[10%] right-[20%] w-500px h-500px rounded-full bg-purple-600/15 blur-[120px]" />
+        <div className="absolute bottom-[10%] left-[20%] w-400px h-400px rounded-full bg-brand-600/10 blur-[100px]" />
       </div>
 
       <div className="w-full max-w-md">
