@@ -5,10 +5,14 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateWebsiteDto } from './dto';
+import { ScreenshotsService } from '../screenshots/screenshots.service';
 
 @Injectable()
 export class WebsitesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly screenshotsService: ScreenshotsService,
+  ) {}
 
   async create(userId: string, dto: CreateWebsiteDto) {
     const website = await this.prisma.website.create({
@@ -27,7 +31,28 @@ export class WebsitesService {
       },
     });
 
+    // Trigger screenshot di background
+    this.takeInitialScreenshot(website.id, website.url).catch(console.error);
+
     return website;
+  }
+
+  private async takeInitialScreenshot(websiteId: string, url: string) {
+    try {
+      const screenshotPath = await this.screenshotsService.captureScreenshot(
+        url,
+        websiteId,
+      );
+
+      await this.prisma.screenshot.create({
+        data: {
+          websiteId,
+          fileUrl: screenshotPath,
+        },
+      });
+    } catch (error) {
+      console.error(`Gagal mengambil screenshot otomatis untuk ${url}:`, error);
+    }
   }
 
   async findAllByUser(userId: string) {
