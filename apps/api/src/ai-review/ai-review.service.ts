@@ -10,6 +10,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ScreenshotsService } from '../screenshots/screenshots.service';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as sharp from 'sharp';
 
 interface AiCategoryResult {
   score: number;
@@ -132,7 +133,7 @@ export class AiReviewService {
 
   private async processReview(
     websiteId: string,
-    url: string,
+    url: string | null,
     description: string,
   ) {
     if (!this.apiKey) {
@@ -151,8 +152,8 @@ export class AiReviewService {
 
       if (existingScreenshot) {
         screenshotPath = existingScreenshot.fileUrl;
-      } else {
-        // Ambil screenshot jika belum ada
+      } else if (url) {
+        // Ambil screenshot jika belum ada dan ada URL
         screenshotPath = await this.screenshotsService.captureScreenshot(
           url,
           websiteId,
@@ -176,8 +177,11 @@ export class AiReviewService {
       const fullPath = path.join(absoluteDir, filename);
 
       if (fs.existsSync(fullPath)) {
-        const fileData = fs.readFileSync(fullPath);
-        base64Image = fileData.toString('base64');
+        const optimizedBuffer = await sharp(fullPath)
+          .resize({ width: 1280, withoutEnlargement: true })
+          .jpeg({ quality: 70 })
+          .toBuffer();
+        base64Image = optimizedBuffer.toString('base64');
       }
     } catch (error) {
       console.error(`Gagal mengambil screenshot untuk ${url}:`, error);
@@ -285,10 +289,10 @@ export class AiReviewService {
     });
   }
 
-  private buildPrompt(url: string, description: string): string {
-    return `Analyze the UI/UX of this website based on the provided screenshot and URL:
+  private buildPrompt(url: string | null, description: string): string {
+    return `Analyze the UI/UX of this website based on the provided screenshot${url ? ' and URL' : ''}:
 
-URL: ${url}
+${url ? `URL: ${url}` : ''}
 ${description ? `Description: ${description}` : ''}
 
 Evaluate the following categories on a scale of 0-100 and provide detailed feedback:

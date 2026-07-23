@@ -14,7 +14,7 @@ export class WebsitesService {
     private readonly screenshotsService: ScreenshotsService,
   ) {}
 
-  async create(userId: string, dto: CreateWebsiteDto) {
+  async create(userId: string, dto: CreateWebsiteDto, files?: Express.Multer.File[]) {
     const website = await this.prisma.website.create({
       data: {
         userId,
@@ -31,8 +31,26 @@ export class WebsitesService {
       },
     });
 
-    // Trigger screenshot di background
-    this.takeInitialScreenshot(website.id, website.url).catch(console.error);
+    if (files && files.length > 0) {
+      // User uploaded manual screenshots
+      for (const file of files) {
+        try {
+          const filePath = await this.screenshotsService.saveUploadedFile(file, website.id);
+          await this.prisma.screenshot.create({
+            data: {
+              websiteId: website.id,
+              fileUrl: filePath,
+              type: 'manual',
+            },
+          });
+        } catch (error) {
+          console.error('Failed to save manual screenshot:', error);
+        }
+      }
+    } else if (dto.url) {
+      // Trigger auto screenshot di background only if URL is provided and no manual files
+      this.takeInitialScreenshot(website.id, dto.url).catch(console.error);
+    }
 
     return website;
   }

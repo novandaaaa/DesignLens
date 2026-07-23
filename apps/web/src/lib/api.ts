@@ -22,18 +22,20 @@ class ApiClient {
     const { method = 'GET', body, headers = {} } = options;
     const token = this.getToken();
 
+    const isFormData = body instanceof FormData;
+
     const config: RequestInit = {
       method,
       cache: 'no-store',
       headers: {
-        'Content-Type': 'application/json',
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...headers,
       },
     };
 
     if (body) {
-      config.body = JSON.stringify(body);
+      config.body = isFormData ? (body as FormData) : JSON.stringify(body);
     }
 
     const response = await fetch(`${this.baseUrl}/api${endpoint}`, config);

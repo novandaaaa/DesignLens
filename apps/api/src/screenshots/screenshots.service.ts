@@ -67,4 +67,14 @@ export class ScreenshotsService {
       }
     }
   }
+  async saveUploadedFile(file: Express.Multer.File, websiteId: string): Promise<string> {
+    const fileName = `${websiteId}-manual-${Date.now()}${path.extname(file.originalname) || '.png'}`;
+    const absoluteDir = path.resolve(process.cwd(), this.screenshotDir);
+    const filePath = path.join(absoluteDir, fileName);
+    
+    fs.writeFileSync(filePath, file.buffer);
+    this.logger.log(`Manual screenshot saved successfully: ${filePath}`);
+    
+    return `/screenshots/${fileName}`;
+  }
 }

@@ -38,7 +38,7 @@ export default function LandingPage() {
           <div className="hidden md:flex items-center gap-8 text-sm text-text-secondary">
             <a href="#features" className="hover:text-text-primary transition-colors">Fitur</a>
             <a href="#how-it-works" className="hover:text-text-primary transition-colors">Cara Kerja</a>
-            <a href="#community" className="hover:text-text-primary transition-colors">Komunitas</a>
+            <Link href="/community" className="hover:text-text-primary transition-colors">Komunitas</Link>
           </div>
 
           <div className="flex items-center gap-3">

@@ -11,8 +11,9 @@ export class CreateWebsiteDto {
   @MaxLength(200)
   title: string;
 
+  @IsOptional()
   @IsUrl()
-  url: string;
+  url?: string;
 
   @IsUUID()
   categoryId: string;

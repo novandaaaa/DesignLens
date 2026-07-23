@@ -73,7 +73,7 @@ model Website {
   userId         String   @map("user_id")
   categoryId     String   @map("category_id")
   title          String
-  url            String
+  url            String?
   description    String?
   targetAudience String?  @map("target_audience")
   feedbackFocus  String?  @map("feedback_focus")
