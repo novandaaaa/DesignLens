@@ -7,6 +7,9 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
+import { ScreenshotsService } from '../screenshots/screenshots.service';
+import * as path from 'path';
+import * as fs from 'fs';
 
 interface AiCategoryResult {
   score: number;
@@ -32,12 +35,15 @@ export class AiReviewService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
+    private readonly screenshotsService: ScreenshotsService,
   ) {
     this.apiKey = this.configService.get<string>('OPENROUTER_API_KEY', '');
-    this.model = this.configService.get<string>(
-      'OPENROUTER_MODEL',
-      'qwen/qwen3-coder:free',
-    );
+    // Gunakan model vision secara default jika tidak ada, atau biarkan pakai yang ada di env
+    const envModel = this.configService.get<string>('OPENROUTER_MODEL');
+    this.model =
+      envModel === 'qwen/qwen3-coder:free' || !envModel
+        ? 'google/gemini-2.5-flash:free' // model vision gratis
+        : envModel;
   }
 
   async createReview(websiteId: string, userId: string) {
@@ -133,7 +139,64 @@ export class AiReviewService {
       throw new Error('OPENROUTER_API_KEY not configured');
     }
 
-    const prompt = this.buildPrompt(url, description);
+    let screenshotPath = '';
+    let base64Image = '';
+
+    try {
+      // Cek apakah screenshot sudah ada
+      const existingScreenshot = await this.prisma.screenshot.findFirst({
+        where: { websiteId },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      if (existingScreenshot) {
+        screenshotPath = existingScreenshot.fileUrl;
+      } else {
+        // Ambil screenshot jika belum ada
+        screenshotPath = await this.screenshotsService.captureScreenshot(
+          url,
+          websiteId,
+        );
+
+        // Simpan path ke db
+        await this.prisma.screenshot.create({
+          data: {
+            websiteId,
+            fileUrl: screenshotPath,
+          },
+        });
+      }
+
+      // Baca file jadi base64
+      const absoluteDir = path.resolve(
+        process.cwd(),
+        this.configService.get<string>('SCREENSHOT_DIR') || './screenshots',
+      );
+      const filename = path.basename(screenshotPath);
+      const fullPath = path.join(absoluteDir, filename);
+
+      if (fs.existsSync(fullPath)) {
+        const fileData = fs.readFileSync(fullPath);
+        base64Image = fileData.toString('base64');
+      }
+    } catch (error) {
+      console.error(`Gagal mengambil screenshot untuk ${url}:`, error);
+      // Tetap lanjutkan review meskipun tanpa screenshot jika gagal
+    }
+
+    const promptText = this.buildPrompt(url, description);
+
+    // Format pesan multimodal (Vision)
+    const userMessageContent: any[] = [{ type: 'text', text: promptText }];
+
+    if (base64Image) {
+      userMessageContent.push({
+        type: 'image_url',
+        image_url: {
+          url: `data:image/png;base64,${base64Image}`,
+        },
+      });
+    }
 
     const response = await fetch(
       'https://openrouter.ai/api/v1/chat/completions',
@@ -155,7 +218,7 @@ export class AiReviewService {
             },
             {
               role: 'user',
-              content: prompt,
+              content: userMessageContent,
             },
           ],
           temperature: 0.3,
@@ -223,7 +286,7 @@ export class AiReviewService {
   }
 
   private buildPrompt(url: string, description: string): string {
-    return `Analyze the UI/UX of this website:
+    return `Analyze the UI/UX of this website based on the provided screenshot and URL:
 
 URL: ${url}
 ${description ? `Description: ${description}` : ''}
