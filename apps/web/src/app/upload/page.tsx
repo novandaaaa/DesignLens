@@ -12,6 +12,7 @@ export default function UploadPage() {
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [files, setFiles] = useState<File[]>([]);
 
   const [form, setForm] = useState({
     title: '',
@@ -38,15 +39,26 @@ export default function UploadPage() {
     setError('');
     setLoading(true);
 
+    if (!form.url && files.length === 0) {
+      setError('Harap masukkan URL atau unggah minimal satu foto website.');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const website = await api.createWebsite({
-        title: form.title,
-        url: form.url,
-        categoryId: form.categoryId,
-        description: form.description || undefined,
-        targetAudience: form.targetAudience || undefined,
-        feedbackFocus: form.feedbackFocus || undefined,
+      const formData = new FormData();
+      formData.append('title', form.title);
+      formData.append('categoryId', form.categoryId);
+      if (form.url) formData.append('url', form.url);
+      if (form.description) formData.append('description', form.description);
+      if (form.targetAudience) formData.append('targetAudience', form.targetAudience);
+      if (form.feedbackFocus) formData.append('feedbackFocus', form.feedbackFocus);
+      
+      files.forEach((file) => {
+        formData.append('files', file);
       });
+
+      const website = await api.createWebsite(formData);
 
       // Trigger AI review if selected
       if (form.reviewType === 'ai' || form.reviewType === 'both') {
@@ -96,17 +108,47 @@ export default function UploadPage() {
           {/* URL */}
           <div>
             <label htmlFor="url" className="block text-sm font-medium text-text-secondary mb-1.5">
-              URL Website <span className="text-red-400">*</span>
+              URL Website <span className="text-text-tertiary font-normal">(Opsional jika mengunggah foto)</span>
             </label>
             <input
               id="url"
               type="url"
               value={form.url}
               onChange={(e) => setForm({ ...form, url: e.target.value })}
-              required
-              className="w-full px-4 py-3 rounded-xl bg-surface-100 border focus::border-brand:500 placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all"
+              className="w-full px-4 py-3 rounded-xl bg-surface-100 border focus:border-brand-500 placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all"
               placeholder="https://example.com"
             />
+          </div>
+
+          {/* Photos */}
+          <div>
+            <label htmlFor="photos" className="block text-sm font-medium text-text-secondary mb-1.5">
+              Foto Website <span className="text-text-tertiary font-normal">(Opsional jika mengisi URL)</span>
+            </label>
+            <input
+              id="photos"
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={(e) => {
+                if (e.target.files) {
+                  setFiles(Array.from(e.target.files));
+                }
+              }}
+              className="w-full px-4 py-3 rounded-xl bg-surface-100 border text-sm text-text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-brand-500/10 file:text-brand-400 hover:file:bg-brand-500/20 focus:outline-none focus:border-brand-500 transition-all"
+            />
+            {files.length > 0 && (
+              <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
+                {files.map((file, i) => (
+                  <div key={i} className="relative w-20 h-20 shrink-0 rounded-lg overflow-hidden border border-border">
+                    <img src={URL.createObjectURL(file)} alt="preview" className="w-full h-full object-cover" />
+                  </div>
+                ))}
+              </div>
+            )}
+            <p className="text-xs text-text-tertiary mt-2">
+              Jika Anda tidak mengisi URL, AI akan mereview berdasarkan foto yang Anda unggah.
+            </p>
           </div>
 
           {/* Title */}

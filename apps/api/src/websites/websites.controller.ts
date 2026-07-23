@@ -6,7 +6,10 @@ import {
   Body,
   Param,
   UseGuards,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { WebsitesService } from './websites.service';
 import { CreateWebsiteDto } from './dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -18,8 +21,13 @@ export class WebsitesController {
   constructor(private readonly websitesService: WebsitesService) {}
 
   @Post()
-  create(@CurrentUser('id') userId: string, @Body() dto: CreateWebsiteDto) {
-    return this.websitesService.create(userId, dto);
+  @UseInterceptors(FilesInterceptor('files', 5))
+  create(
+    @CurrentUser('id') userId: string,
+    @Body() dto: CreateWebsiteDto,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    return this.websitesService.create(userId, dto, files);
   }
 
   @Get()
