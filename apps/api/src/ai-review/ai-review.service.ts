@@ -10,7 +10,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ScreenshotsService } from '../screenshots/screenshots.service';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as sharp from 'sharp';
+import sharp from 'sharp';
 
 interface AiCategoryResult {
   score: number;
@@ -43,7 +43,7 @@ export class AiReviewService {
     const envModel = this.configService.get<string>('OPENROUTER_MODEL');
     this.model =
       envModel === 'qwen/qwen3-coder:free' || !envModel
-        ? 'google/gemini-2.5-flash:free' // model vision gratis
+        ? 'google/gemini-2.0-flash-exp:free' // model vision gratis yang valid
         : envModel;
   }
 
@@ -88,15 +88,35 @@ export class AiReviewService {
     });
 
     // Process in background (non-blocking)
-    this.processReview(websiteId, website.url, website.description ?? '').catch(
-      (error) => {
+    void (async () => {
+      try {
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(
+            () =>
+              reject(new Error('AI Review process timed out after 90 seconds')),
+            90000,
+          ),
+        );
+
+        await Promise.race([
+          this.processReview(websiteId, website.url, website.description ?? ''),
+          timeoutPromise,
+        ]);
+      } catch (error) {
         console.error(`AI Review failed for website ${websiteId}:`, error);
-        void this.prisma.aiReview.update({
-          where: { websiteId },
-          data: { status: 'FAILED' },
-        });
-      },
-    );
+        try {
+          await this.prisma.aiReview.update({
+            where: { websiteId },
+            data: { status: 'FAILED' },
+          });
+        } catch (dbError) {
+          console.error(
+            'Failed to update AI Review status to FAILED in DB:',
+            dbError,
+          );
+        }
+      }
+    })();
 
     return {
       message: 'AI Review sedang diproses',
@@ -228,6 +248,7 @@ export class AiReviewService {
           temperature: 0.3,
           max_tokens: 4000,
         }),
+        signal: AbortSignal.timeout(60000), // Timeout 60 detik agar tidak stuck berjam-jam
       },
     );
 

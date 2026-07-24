@@ -10,7 +10,11 @@ async function bootstrap() {
 
   // CORS — allow Next.js frontend
   app.enableCors({
-    origin: process.env.FRONTEND_URL ?? 'http://localhost:3000',
+    origin: [
+      process.env.FRONTEND_URL ?? 'http://localhost:3000',
+      'http://127.0.0.1:3000',
+      'http://localhost:3000',
+    ],
     credentials: true,
   });
 
@@ -24,7 +28,7 @@ async function bootstrap() {
   );
 
   const port = process.env.API_PORT ?? 4000;
-  await app.listen(port);
-  console.log(`🚀 DesignLens API running on http://localhost:${port}/api`);
+  await app.listen(port, '0.0.0.0');
+  console.log(`🚀 DesignLens API running on http://127.0.0.1:${port}/api`);
 }
 void bootstrap();
