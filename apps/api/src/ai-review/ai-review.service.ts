@@ -10,7 +10,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ScreenshotsService } from '../screenshots/screenshots.service';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as sharp from 'sharp';
+import sharp from 'sharp';
 
 interface AiCategoryResult {
   score: number;

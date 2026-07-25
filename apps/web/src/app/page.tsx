@@ -3,6 +3,15 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
+import ThreeBackground from '@/components/ThreeBackground';
+import dynamic from 'next/dynamic';
+
+const HeroScene = dynamic(
+  () => import('@/components/HeroScene'),
+  {
+    ssr: false,
+  }
+);
 
 export default function LandingPage() {
   const { isAuthenticated } = useAuth();
@@ -13,12 +22,11 @@ export default function LandingPage() {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* Background Gradient Orbs */}
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute top-[-20%] left-[-10%] w-600px h-600px rounded-full bg-brand-600/20 blur-[120px] animate-float" />
-        <div className="absolute top-[30%] right-[-10%] w-500px h-500px rounded-full bg-purple-600/15 blur-[100px] animate-float" style={{ animationDelay: '2s' }} />
-        <div className="absolute bottom-[-10%] left-[30%] w-400px h-400px rounded-full bg-pink-600/10 blur-[100px] animate-float" style={{ animationDelay: '4s' }} />
-      </div>
+      {/* 3D Ambient Background — menggantikan CSS gradient orbs statis */}
+      <ThreeBackground />
+
+      {/* Wash gradient tipis di atas 3D agar teks tetap kontras & mudah dibaca */}
+      <div className="fixed inset-0 -z-10 bg-linear-to-b from-[#0F172A]/40 via-transparent to-[#0F172A]/60" />
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0F172A] border-b border-white/10">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
+import GlobalBackground from "@/components/GlobalBackground";
 
 const inter = Inter({
   variable: "--font-geist-sans",
@@ -23,7 +24,10 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${inter.variable} dark`}>
       <body className="min-h-screen bg-background text-foreground font-sans antialiased">
-        <AuthProvider>{children}</AuthProvider>
+        <GlobalBackground />
+        <div className="relative z-10">
+          <AuthProvider>{children}</AuthProvider>
+        </div>
       </body>
     </html>
   );
