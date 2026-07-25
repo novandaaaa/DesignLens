@@ -111,6 +111,18 @@ export default function LandingPage() {
         {/* Floating score badges — melayang di kiri-kanan mengiringi monitor
             3D di belakangnya, warnanya senada dengan flying objects di scene */}
         <div
+          className={`hidden lg:block absolute top-[14%] left-[3%] transition-all duration-1000 delay-400 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+        >
+          <div className="glass-card px-4 py-3 flex items-center gap-3 shadow-xl">
+            <span className="w-2 h-2 rounded-full bg-fuchsia-400" />
+            <div>
+              <div className="text-xs text-text-tertiary">Color</div>
+              <div className="text-lg font-bold text-text-primary">78</div>
+            </div>
+          </div>
+        </div>
+
+        <div
           className={`hidden lg:block absolute top-[30%] left-[6%] transition-all duration-1000 delay-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
         >
           <div className="glass-card px-4 py-3 flex items-center gap-3 shadow-xl">
@@ -130,6 +142,18 @@ export default function LandingPage() {
             <div>
               <div className="text-xs text-text-tertiary">Accessibility</div>
               <div className="text-lg font-bold text-text-primary">88</div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className={`hidden lg:block absolute top-[16%] right-[3%] transition-all duration-1000 delay-450 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+        >
+          <div className="glass-card px-4 py-3 flex items-center gap-3 shadow-xl">
+            <span className="w-2 h-2 rounded-full bg-yellow-400" />
+            <div>
+              <div className="text-xs text-text-tertiary">CTA</div>
+              <div className="text-lg font-bold text-text-primary">71</div>
             </div>
           </div>
         </div>
