@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import ThreeBackground from '@/components/ThreeBackground';
+import Lightfall from "@/components/Lightfall/Lightfall";
 
 export default function LandingPage() {
   const { isAuthenticated } = useAuth();

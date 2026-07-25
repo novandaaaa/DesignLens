@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import GlobalBackground from "@/components/GlobalBackground";
+import TargetCursor from "@/components/TargetCursor";
 
 const inter = Inter({
   variable: "--font-geist-sans",
@@ -24,6 +25,13 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${inter.variable} dark`}>
       <body className="min-h-screen bg-background text-foreground font-sans antialiased">
+        <TargetCursor
+          spinDuration={2}
+          hideDefaultCursor={true}
+          parallaxOn={true}
+          cursorColor="#7dd3fc"
+          cursorColorOnTarget="#f472b6"
+        /> {/* ⬅️ tambahkan ini, di luar div z-10 juga tidak masalah */}
         <GlobalBackground />
         <div className="relative z-10">
           <AuthProvider>{children}</AuthProvider>
