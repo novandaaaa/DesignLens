@@ -4,14 +4,6 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import ThreeBackground from '@/components/ThreeBackground';
-import dynamic from 'next/dynamic';
-
-const HeroScene = dynamic(
-  () => import('@/components/HeroScene'),
-  {
-    ssr: false,
-  }
-);
 
 export default function LandingPage() {
   const { isAuthenticated } = useAuth();
@@ -22,7 +14,7 @@ export default function LandingPage() {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* 3D Ambient Background — menggantikan CSS gradient orbs statis */}
+      {/* 3D Ambient Background — monitor mockup + partikel + flying objects */}
       <ThreeBackground />
 
       {/* Wash gradient tipis di atas 3D agar teks tetap kontras & mudah dibaca */}
@@ -77,15 +69,16 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-20 px-6">
+      {/* Hero Section — teks dikompakkan & dikasih ruang kosong di bawah
+          supaya monitor 3D di background kelihatan penuh tanpa ketutupan */}
+      <section className="relative pt-20 pb-[26rem] md:pb-[32rem] px-6">
         <div className={`max-w-5xl mx-auto text-center transition-all duration-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-brand-500/20 bg-brand-500/5 text-brand-400 text-sm mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-brand-500/20 bg-brand-500/5 text-brand-400 text-sm mb-6">
             <span className="w-2 h-2 rounded-full bg-accent-400 animate-pulse" />
             Powered by AI + Community Review
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold leading-tight tracking-tight mb-6">
+          <h1 className="text-4xl md:text-6xl font-bold leading-tight tracking-tight mb-5">
             <span className="text-text-primary">Evaluasi Desain</span>
             <br />
             <span className="gradient-text">Website Anda</span>
@@ -93,10 +86,9 @@ export default function LandingPage() {
             <span className="text-text-primary">dalam Hitungan Detik</span>
           </h1>
 
-          <p className="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-base md:text-lg text-text-secondary max-w-xl mx-auto mb-8 leading-relaxed">
             Dapatkan feedback UI/UX dari <strong className="text-text-primary">AI</strong> secara instan
             dan masukan autentik dari <strong className="text-text-primary">komunitas developer</strong>.
-            Dua perspektif, satu platform.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -116,53 +108,52 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Hero Visual — Score Preview */}
-        <div className={`max-w-4xl mx-auto mt-16 transition-all duration-1000 delay-300 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-          <div className="glass-card p-6 md:p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-3 h-3 rounded-full bg-red-400" />
-              <div className="w-3 h-3 rounded-full bg-yellow-400" />
-              <div className="w-3 h-3 rounded-full bg-green-400" />
-              <span className="text-xs text-text-tertiary ml-2 font-mono">designlens.id/review</span>
+        {/* Floating score badges — melayang di kiri-kanan mengiringi monitor
+            3D di belakangnya, warnanya senada dengan flying objects di scene */}
+        <div
+          className={`hidden lg:block absolute top-[30%] left-[6%] transition-all duration-1000 delay-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+        >
+          <div className="glass-card px-4 py-3 flex items-center gap-3 shadow-xl">
+            <span className="w-2 h-2 rounded-full bg-indigo-400" />
+            <div>
+              <div className="text-xs text-text-tertiary">Layout</div>
+              <div className="text-lg font-bold text-text-primary">92</div>
             </div>
+          </div>
+        </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {[
-                { label: 'Layout', score: 92, color: 'from-green-400 to-emerald-500' },
-                { label: 'Typography', score: 85, color: 'from-blue-400 to-cyan-500' },
-                { label: 'Color', score: 78, color: 'from-purple-400 to-pink-500' },
-                { label: 'Navigation', score: 88, color: 'from-orange-400 to-red-500' },
-                { label: 'CTA', score: 71, color: 'from-yellow-400 to-orange-500' },
-                { label: 'Accessibility', score: 65, color: 'from-teal-400 to-green-500' },
-              ].map((item, i) => (
-                <div
-                  key={item.label}
-                  className="relative p-4 rounded-xl bg-surface-100/50 border border-border/50 hover:border-brand-500/30 transition-all duration-300 hover:-translate-y-1"
-                  style={{ animationDelay: `${i * 100}ms` }}
-                >
-                  <div className="text-xs text-text-tertiary mb-2">{item.label}</div>
-                  <div className="text-3xl font-bold text-text-primary mb-2">{item.score}</div>
-                  <div className="w-full h-1.5 rounded-full bg-surface-200 overflow-hidden">
-                    <div
-                      className={`h-full rounded-full bg-linear-to-r ${item.color} transition-all duration-1000`}
-                      style={{ width: mounted ? `${item.score}%` : '0%', transitionDelay: `${800 + i * 150}ms` }}
-                    />
-                  </div>
-                </div>
-              ))}
+        <div
+          className={`hidden lg:block absolute top-[55%] left-[10%] transition-all duration-1000 delay-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+        >
+          <div className="glass-card px-4 py-3 flex items-center gap-3 shadow-xl">
+            <span className="w-2 h-2 rounded-full bg-pink-400" />
+            <div>
+              <div className="text-xs text-text-tertiary">Accessibility</div>
+              <div className="text-lg font-bold text-text-primary">88</div>
             </div>
+          </div>
+        </div>
 
-            <div className="mt-6 p-4 rounded-xl bg-brand-500/5 border border-brand-500/10">
-              <div className="flex items-center gap-2 mb-2">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-brand-400">
-                  <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" />
-                  <path d="M12 6v6l4 2" />
-                </svg>
-                <span className="text-sm font-medium text-brand-400">AI Recommendation</span>
-              </div>
-              <p className="text-sm text-text-secondary leading-relaxed">
-                Tingkatkan kontras warna pada CTA button dan tambahkan aria-labels untuk meningkatkan skor accessibility. Layout sudah sangat baik dengan visual hierarchy yang jelas.
-              </p>
+        <div
+          className={`hidden lg:block absolute top-[35%] right-[6%] transition-all duration-1000 delay-600 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+        >
+          <div className="glass-card px-4 py-3 flex items-center gap-3 shadow-xl">
+            <span className="w-2 h-2 rounded-full bg-teal-400" />
+            <div>
+              <div className="text-xs text-text-tertiary">Typography</div>
+              <div className="text-lg font-bold text-text-primary">85</div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className={`hidden lg:block absolute top-[60%] right-[10%] transition-all duration-1000 delay-800 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+        >
+          <div className="glass-card px-4 py-3 flex items-center gap-3 shadow-xl">
+            <span className="w-2 h-2 rounded-full bg-purple-400" />
+            <div>
+              <div className="text-xs text-text-tertiary">Navigation</div>
+              <div className="text-lg font-bold text-text-primary">88</div>
             </div>
           </div>
         </div>
