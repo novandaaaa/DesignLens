@@ -81,7 +81,7 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
   if (!post) return null;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <nav className="border-b border-border bg-surface-0/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center">
           <Link href="/community" className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors">

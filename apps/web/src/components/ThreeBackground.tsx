@@ -11,6 +11,18 @@ export default function ThreeBackground() {
     if (!container) return;
 
     // ---------------------------------------
+    // MOTION / DEVICE PREFERENCES
+    // ---------------------------------------
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
+    const isMobile = window.innerWidth < 768;
+
+    // Kalau user minta reduced motion, jangan render 3D scene sama sekali —
+    // cukup tinggalkan div kosong (wash gradient di page.tsx tetap jalan).
+    if (prefersReducedMotion) return;
+
+    // ---------------------------------------
     // SCENE
     // ---------------------------------------
     const scene = new THREE.Scene();
@@ -30,10 +42,11 @@ export default function ThreeBackground() {
     // RENDERER
     // ---------------------------------------
     const renderer = new THREE.WebGLRenderer({
-      antialias: true,
+      antialias: !isMobile,
       alpha: true,
+      powerPreference: 'low-power',
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     container.appendChild(renderer.domElement);
@@ -103,12 +116,21 @@ export default function ThreeBackground() {
     website.add(button);
 
     // Content cards
-    for (let i = 0; i < 4; i++) {
+    // Catatan: layar (screen) tingginya 4.4 -> half height 2.2, dan frame
+    // half height 2.5. Sebelumnya loop ini 4 card dengan spacing 0.65 mulai
+    // dari y=-1, yang bikin card ke-3 & ke-4 jatuh di y=-2.3 & y=-2.95 —
+    // keluar dari batas layar (-2.2) bahkan keluar dari frame (-2.5),
+    // muncul sebagai garis abu-abu nongol di luar monitor.
+    // Fix: 3 card, spacing lebih rapat, semua muat dalam batas layar.
+    const cardCount = 3;
+    const cardSpacing = 0.5;
+    const cardStartY = -0.95;
+    for (let i = 0; i < cardCount; i++) {
       const card = new THREE.Mesh(
         new THREE.PlaneGeometry(6.2, 0.45),
         new THREE.MeshBasicMaterial({ color: 0x1e293b })
       );
-      card.position.set(0, -1 + i * -0.65, 0.14);
+      card.position.set(0, cardStartY + i * -cardSpacing, 0.14);
       website.add(card);
     }
 
@@ -172,6 +194,7 @@ export default function ThreeBackground() {
 
     // ---------------------------------------
     // FLOATING PARTICLES (ambient)
+    // Dikurangi di mobile: 60 -> 24
     // ---------------------------------------
     const particles = new THREE.Group();
     scene.add(particles);
@@ -182,9 +205,10 @@ export default function ThreeBackground() {
       opacity: 0.5,
     });
 
+    const particleCount = isMobile ? 24 : 60;
     const particleList: THREE.Mesh[] = [];
 
-    for (let i = 0; i < 60; i++) {
+    for (let i = 0; i < particleCount; i++) {
       const particle = new THREE.Mesh(
         new THREE.SphereGeometry(0.03, 8, 8),
         particleMaterial
@@ -220,6 +244,8 @@ export default function ThreeBackground() {
 
     // ---------------------------------------
     // FLYING OBJECTS (di samping monitor)
+    // Di-skip total di mobile — layar sempit bikin objek numpuk ke teks,
+    // dan ini elemen paling mahal (wireframe geometry banyak).
     // ---------------------------------------
     const flyingObjects = new THREE.Group();
     scene.add(flyingObjects);
@@ -227,19 +253,18 @@ export default function ThreeBackground() {
     const flyingPalette = [0x6366f1, 0xa855f7, 0xec4899, 0x2dd4bf];
     const flyingMeshes: THREE.Mesh[] = [];
 
-    // Posisi dasar tiap objek: sengaja disebar di kiri & kanan monitor
-    // (monitor lebarnya ~8, jadi mulai dari x ±5 ke luar) dan macam-macam
-    // ketinggian/kedalaman biar ga baris lurus.
-    const flyingSpots: [number, number, number][] = [
-      [-7.5, 2.2, -1],
-      [-6.5, -1.8, 1.5],
-      [-8, -3.5, -2],
-      [7.5, 2.5, -1.5],
-      [6.8, -1.5, 1],
-      [8.2, -3.2, -1],
-      [-5.5, 4, 0.5],
-      [5.8, 4.2, -0.5],
-    ];
+    const flyingSpots: [number, number, number][] = isMobile
+      ? []
+      : [
+          [-7.5, 2.2, -1],
+          [-6.5, -1.8, 1.5],
+          [-8, -3.5, -2],
+          [7.5, 2.5, -1.5],
+          [6.8, -1.5, 1],
+          [8.2, -3.2, -1],
+          [-5.5, 4, 0.5],
+          [5.8, 4.2, -0.5],
+        ];
 
     flyingSpots.forEach(([x, y, z], i) => {
       const geometry =
@@ -295,12 +320,26 @@ export default function ThreeBackground() {
     window.addEventListener('resize', handleResize);
 
     // ---------------------------------------
+    // VISIBILITY: pause render loop saat tab nggak aktif
+    // ---------------------------------------
+    let isPaused = false;
+    const handleVisibilityChange = () => {
+      isPaused = document.hidden;
+      if (!isPaused) {
+        clock.getDelta(); // buang delta yang numpuk selama hidden
+        frameId = requestAnimationFrame(animate);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // ---------------------------------------
     // CLOCK + ANIMATE
     // ---------------------------------------
     const clock = new THREE.Clock();
     let frameId: number;
 
     const animate = () => {
+      if (isPaused) return; // stop loop sepenuhnya, resume via visibilitychange
       frameId = requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
 
@@ -327,8 +366,7 @@ export default function ThreeBackground() {
       // Ring cahaya berputar pelan
       ring.rotation.z += 0.003;
 
-      // Objek terbang di samping monitor: melayang naik-turun + berputar,
-      // sedikit ikut parallax mouse biar terasa hidup di ruang 3D
+      // Objek terbang di samping monitor (kosong di mobile)
       flyingMeshes.forEach((mesh) => {
         mesh.position.y =
           mesh.userData.basePosition.y +
@@ -361,6 +399,7 @@ export default function ThreeBackground() {
       cancelAnimationFrame(frameId);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
 
       scene.traverse((child) => {
         if (child instanceof THREE.Mesh) {
