@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 export default function ThreeBackground() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -27,318 +26,193 @@ export default function ThreeBackground() {
     // CAMERA
     // ---------------------------------------
     const camera = new THREE.PerspectiveCamera(
-      45,
+      50,
       container.clientWidth / container.clientHeight,
       0.1,
-      1000
+      100
     );
-    camera.position.set(0, 0, 14);
+    camera.position.z = 12;
 
     // ---------------------------------------
-    // RENDERER
+    // RENDERER - Optimized
     // ---------------------------------------
     const renderer = new THREE.WebGLRenderer({
-      antialias: !isMobile,
+      antialias: false,
       alpha: true,
-      powerPreference: 'high-performance',
+      powerPreference: 'low-power',
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.3;
     container.appendChild(renderer.domElement);
-
-    // ---------------------------------------
-    // ENVIRONMENT
-    // ---------------------------------------
-    const pmremGenerator = new THREE.PMREMGenerator(renderer);
-    scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
 
     // ---------------------------------------
     // LIGHTS
     // ---------------------------------------
-    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    scene.add(new THREE.AmbientLight(0xffffff, 0.4));
 
-    const light1 = new THREE.PointLight(0x7c3aed, 250, 25);
-    light1.position.set(8, 8, 8);
+    const light1 = new THREE.PointLight(0x8b5cf6, 80, 15);
+    light1.position.set(5, 5, 5);
     scene.add(light1);
 
-    const light2 = new THREE.PointLight(0x06b6d4, 200, 25);
-    light2.position.set(-8, -6, 6);
+    const light2 = new THREE.PointLight(0x06b6d4, 60, 15);
+    light2.position.set(-5, -5, 5);
     scene.add(light2);
 
-    const light3 = new THREE.PointLight(0xec4899, 150, 20);
-    light3.position.set(0, -8, 4);
-    scene.add(light3);
-
     // ---------------------------------------
-    // HOLOGRAPHIC CORE GROUP
+    // NETWORK CONSTELLATION (Nodes + Connections)
     // ---------------------------------------
-    const holographicCore = new THREE.Group();
-    scene.add(holographicCore);
+    const nodeCount = isMobile ? 15 : 25;
+    const connectionDistance = 3.5;
+    const nodes: THREE.Vector3[] = [];
+    const nodeMeshes: THREE.Mesh[] = [];
 
-    // Material kaca modern
-    const glassMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0xffffff,
-      metalness: 0.1,
-      roughness: 0.1,
-      transmission: 0.95,
-      thickness: 0.8,
-      transparent: true,
-      opacity: 0.85,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.1,
-      side: THREE.DoubleSide,
-    });
+    // Generate random node positions
+    for (let i = 0; i < nodeCount; i++) {
+      const position = new THREE.Vector3(
+        (Math.random() - 0.5) * 14,
+        (Math.random() - 0.5) * 10,
+        (Math.random() - 0.5) * 6
+      );
+      nodes.push(position);
 
-    const wireframeMaterial = new THREE.MeshBasicMaterial({
-      color: 0x06b6d4,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.4,
-    });
-
-    // === CENTRAL CORE (Icosahedron dengan wireframe) ===
-    const coreGeometry = new THREE.IcosahedronGeometry(1.8, 1);
-    const core = new THREE.Mesh(coreGeometry, glassMaterial);
-    holographicCore.add(core);
-
-    const coreWireframe = new THREE.Mesh(coreGeometry, wireframeMaterial);
-    coreWireframe.scale.setScalar(1.02);
-    holographicCore.add(coreWireframe);
-
-    // === INNER ENERGY SPHERE ===
-    const innerSphere = new THREE.Mesh(
-      new THREE.SphereGeometry(1.2, 32, 32),
-      new THREE.MeshStandardMaterial({
-        color: 0x7c3aed,
-        emissive: 0x7c3aed,
-        emissiveIntensity: 1.5,
+      // Node sphere
+      const nodeGeometry = new THREE.SphereGeometry(0.08, 8, 8);
+      const nodeMaterial = new THREE.MeshBasicMaterial({
+        color: 0x38bdf8,
         transparent: true,
-        opacity: 0.6,
-        toneMapped: false,
-      })
-    );
-    holographicCore.add(innerSphere);
-
-    // === ORBITAL RINGS ===
-    const ringColors = [0x8b5cf6, 0x06b6d4, 0xec4899];
-    const rings: THREE.Mesh[] = [];
-
-    for (let i = 0; i < 3; i++) {
-      const ringGeometry = new THREE.TorusGeometry(2.8 + i * 0.4, 0.03, 16, 100);
-      const ringMaterial = new THREE.MeshStandardMaterial({
-        color: ringColors[i],
-        emissive: ringColors[i],
-        emissiveIntensity: 1.2,
-        transparent: true,
-        opacity: 0.7,
-        toneMapped: false,
+        opacity: 0.8,
       });
-      const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-      ring.rotation.x = Math.PI / 2 + i * 0.4;
-      ring.rotation.y = i * 0.5;
-      holographicCore.add(ring);
-      rings.push(ring);
+      const nodeMesh = new THREE.Mesh(nodeGeometry, nodeMaterial);
+      nodeMesh.position.copy(position);
+      nodeMesh.userData = {
+        basePosition: position.clone(),
+        floatSpeed: 0.3 + Math.random() * 0.4,
+        floatOffset: Math.random() * Math.PI * 2,
+      };
+      scene.add(nodeMesh);
+      nodeMeshes.push(nodeMesh);
     }
 
-    // === FLOATING GLASS PANELS (dengan type yang benar) ===
-    const panelGroup = new THREE.Group();
-    holographicCore.add(panelGroup);
+    // Connection lines (BufferGeometry untuk performa)
+    const lineGeometry = new THREE.BufferGeometry();
+    const linePositions: number[] = [];
+    const lineColors: number[] = [];
 
-    type PanelData = {
-      pos: [number, number, number];
-      rot: [number, number, number];
-      size: [number, number, number];
-    };
+    nodes.forEach((node, i) => {
+      nodes.forEach((otherNode, j) => {
+        if (i < j && node.distanceTo(otherNode) < connectionDistance) {
+          linePositions.push(
+            node.x, node.y, node.z,
+            otherNode.x, otherNode.y, otherNode.z
+          );
 
-    const panelPositions: PanelData[] = [
-      { pos: [3.5, 1.5, 0], rot: [0, -0.3, 0], size: [2.2, 1.2, 0.1] },
-      { pos: [-3.2, -1, 0.5], rot: [0, 0.4, 0], size: [2, 1, 0.1] },
-      { pos: [0, 3.5, -0.5], rot: [-0.3, 0, 0], size: [2.5, 0.9, 0.1] },
-      { pos: [0, -3.2, 0.8], rot: [0.25, 0, 0], size: [2.3, 0.8, 0.1] },
-    ];
-
-    panelPositions.forEach((panelData) => {
-      const panel = new THREE.Mesh(
-        new THREE.BoxGeometry(...panelData.size),
-        glassMaterial
-      );
-      panel.position.set(...panelData.pos);
-      panel.rotation.set(...panelData.rot);
-      panelGroup.add(panel);
-
-      // Glowing edge untuk setiap panel
-      const edgeGeometry = new THREE.EdgesGeometry(
-        new THREE.BoxGeometry(...panelData.size)
-      );
-      const edgeMaterial = new THREE.LineBasicMaterial({
-        color: 0x06b6d4,
-        transparent: true,
-        opacity: 0.6,
+          // Gradient color based on distance
+          const distance = node.distanceTo(otherNode);
+          const opacity = 1 - distance / connectionDistance;
+          lineColors.push(0.54, 0.36, 0.96, opacity); // Purple
+          lineColors.push(0.22, 0.71, 0.85, opacity); // Cyan
+        }
       });
-      const edges = new THREE.LineSegments(edgeGeometry, edgeMaterial);
-      edges.position.set(...panelData.pos);
-      edges.rotation.set(...panelData.rot);
-      panelGroup.add(edges);
     });
 
-    // === FLOATING PARTICLES AROUND CORE ===
-    const particleCount = isMobile ? 40 : 80;
-    const particles = new THREE.Group();
-    holographicCore.add(particles);
+    lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+    lineGeometry.setAttribute('color', new THREE.Float32BufferAttribute(lineColors, 4));
 
-    const particleMaterial = new THREE.MeshBasicMaterial({
-      color: 0x38bdf8,
+    const lineMaterial = new THREE.LineBasicMaterial({
+      vertexColors: true,
       transparent: true,
-      opacity: 0.8,
+      opacity: 0.3,
       blending: THREE.AdditiveBlending,
     });
 
-    type ParticleData = {
-      mesh: THREE.Mesh;
-      orbitRadius: number;
-      orbitSpeed: number;
-      angle: number;
-    };
-
-    const particleData: ParticleData[] = [];
-
-    for (let i = 0; i < particleCount; i++) {
-      const particle = new THREE.Mesh(
-        new THREE.SphereGeometry(0.04 + Math.random() * 0.04, 8, 8),
-        particleMaterial
-      );
-
-      const orbitRadius = 3 + Math.random() * 3;
-      const angle = Math.random() * Math.PI * 2;
-      const y = (Math.random() - 0.5) * 6;
-
-      particle.position.set(
-        Math.cos(angle) * orbitRadius,
-        y,
-        Math.sin(angle) * orbitRadius
-      );
-
-      particles.add(particle);
-      particleData.push({
-        mesh: particle,
-        orbitRadius,
-        orbitSpeed: 0.3 + Math.random() * 0.5,
-        angle,
-      });
-    }
-
-    // === ENERGY BEAMS ===
-    const beamCount = 6;
-    const beams: THREE.Mesh[] = [];
-
-    for (let i = 0; i < beamCount; i++) {
-      const angle = (i / beamCount) * Math.PI * 2;
-      const beamHeight = 6 + Math.random() * 2;
-      const beam = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.02, 0.02, beamHeight, 8),
-        new THREE.MeshBasicMaterial({
-          color: 0x8b5cf6,
-          transparent: true,
-          opacity: 0.4,
-          blending: THREE.AdditiveBlending,
-        })
-      );
-      beam.position.set(
-        Math.cos(angle) * 4.5,
-        (Math.random() - 0.5) * 3,
-        Math.sin(angle) * 4.5
-      );
-      holographicCore.add(beam);
-      beams.push(beam);
-    }
-
-    // === GLOW EFFECT DI BELAKANG ===
-    const glowGeometry = new THREE.SphereGeometry(5, 32, 32);
-    const glowMaterial = new THREE.MeshBasicMaterial({
-      color: 0x7c3aed,
-      transparent: true,
-      opacity: 0.08,
-      blending: THREE.AdditiveBlending,
-      side: THREE.BackSide,
-    });
-    const glowSphere = new THREE.Mesh(glowGeometry, glowMaterial);
-    holographicCore.add(glowSphere);
+    const connectionLines = new THREE.LineSegments(lineGeometry, lineMaterial);
+    scene.add(connectionLines);
 
     // ---------------------------------------
-    // FLOATING OBJECTS (di sekeliling core)
+    // FLOATING GEOMETRIC ACCENTS
     // ---------------------------------------
-    const flyingObjects = new THREE.Group();
-    scene.add(flyingObjects);
+    const accentCount = isMobile ? 3 : 6;
+    const accents: THREE.Mesh[] = [];
+    const accentColors = [0x8b5cf6, 0x06b6d4, 0xec4899, 0xfbbf24];
 
-    const flyingPalette = [0x6366f1, 0xa855f7, 0xec4899, 0x2dd4bf, 0xfbbf24];
-    const flyingMeshes: THREE.Mesh[] = [];
+    for (let i = 0; i < accentCount; i++) {
+      // Variasi bentuk geometri
+      let geometry: THREE.BufferGeometry;
+      const shapeType = i % 4;
 
-    const flyingSpots: [number, number, number][] = isMobile
-      ? []
-      : [
-          [-9, 3, -2],
-          [-8.5, -2.5, 1.5],
-          [-10, -4, -1],
-          [9, 3.5, -1.5],
-          [8.5, -2, 1],
-          [10, -3.5, -1],
-          [-7, 5, 0.5],
-          [7.5, 5.2, -0.5],
-          [-6, -5.5, 0.8],
-          [6.5, -5, -0.8],
-        ];
-
-    flyingSpots.forEach(([x, y, z], i) => {
-      const geometry =
-        i % 4 === 0
-          ? new THREE.OctahedronGeometry(0.35 + Math.random() * 0.15, 0)
-          : i % 4 === 1
-          ? new THREE.TetrahedronGeometry(0.3 + Math.random() * 0.1, 0)
-          : i % 4 === 2
-          ? new THREE.IcosahedronGeometry(0.28 + Math.random() * 0.12, 0)
-          : new THREE.TorusGeometry(0.25, 0.08, 8, 24);
+      if (shapeType === 0) {
+        geometry = new THREE.OctahedronGeometry(0.4, 0);
+      } else if (shapeType === 1) {
+        geometry = new THREE.TetrahedronGeometry(0.35, 0);
+      } else if (shapeType === 2) {
+        geometry = new THREE.IcosahedronGeometry(0.3, 0);
+      } else {
+        geometry = new THREE.TorusGeometry(0.3, 0.1, 8, 16);
+      }
 
       const material = new THREE.MeshStandardMaterial({
-        color: flyingPalette[i % flyingPalette.length],
-        emissive: flyingPalette[i % flyingPalette.length],
-        emissiveIntensity: 1.2,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.7,
-        toneMapped: false,
+        color: accentColors[i % accentColors.length],
+        roughness: 0.3,
+        metalness: 0.7,
+        flatShading: true,
       });
 
       const mesh = new THREE.Mesh(geometry, material);
-      const basePosition = new THREE.Vector3(x, y, z);
-      mesh.position.copy(basePosition);
-      mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+      mesh.position.set(
+        (Math.random() - 0.5) * 12,
+        (Math.random() - 0.5) * 8,
+        (Math.random() - 0.5) * 4
+      );
 
-      mesh.userData.basePosition = basePosition;
-      mesh.userData.floatSpeed = 0.6 + Math.random() * 0.6;
-      mesh.userData.floatOffset = Math.random() * Math.PI * 2;
-      mesh.userData.floatAmplitude = 0.3 + Math.random() * 0.3;
-      mesh.userData.spinSpeed = 0.5 + Math.random() * 0.6;
+      mesh.userData = {
+        rotSpeedX: (Math.random() - 0.5) * 0.015,
+        rotSpeedY: (Math.random() - 0.5) * 0.015,
+        floatSpeed: 0.4 + Math.random() * 0.4,
+        floatOffset: Math.random() * Math.PI * 2,
+        baseY: mesh.position.y,
+      };
 
-      flyingObjects.add(mesh);
-      flyingMeshes.push(mesh);
+      scene.add(mesh);
+      accents.push(mesh);
+    }
+
+    // ---------------------------------------
+    // AMBIENT PARTICLES (sangat sedikit)
+    // ---------------------------------------
+    const particleCount = isMobile ? 15 : 30;
+    const particleGeometry = new THREE.BufferGeometry();
+    const particlePositions = new Float32Array(particleCount * 3);
+
+    for (let i = 0; i < particleCount; i++) {
+      particlePositions[i * 3] = (Math.random() - 0.5) * 16;
+      particlePositions[i * 3 + 1] = (Math.random() - 0.5) * 12;
+      particlePositions[i * 3 + 2] = (Math.random() - 0.5) * 8;
+    }
+
+    particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+
+    const particleMaterial = new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 0.05,
+      transparent: true,
+      opacity: 0.4,
+      blending: THREE.AdditiveBlending,
     });
+
+    const particles = new THREE.Points(particleGeometry, particleMaterial);
+    scene.add(particles);
 
     // ---------------------------------------
     // MOUSE PARALLAX
     // ---------------------------------------
     let mouseX = 0;
     let mouseY = 0;
-    let targetRotationX = 0;
-    let targetRotationY = 0;
 
     const handleMouseMove = (e: MouseEvent) => {
       mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
       mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
     };
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
 
     // ---------------------------------------
     // RESIZE
@@ -349,20 +223,7 @@ export default function ThreeBackground() {
       camera.updateProjectionMatrix();
       renderer.setSize(container.clientWidth, container.clientHeight);
     };
-    window.addEventListener('resize', handleResize);
-
-    // ---------------------------------------
-    // VISIBILITY
-    // ---------------------------------------
-    let isPaused = false;
-    const handleVisibilityChange = () => {
-      isPaused = document.hidden;
-      if (!isPaused) {
-        clock.getDelta();
-        frameId = requestAnimationFrame(animate);
-      }
-    };
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('resize', handleResize, { passive: true });
 
     // ---------------------------------------
     // ANIMATE
@@ -371,78 +232,37 @@ export default function ThreeBackground() {
     let frameId: number;
 
     const animate = () => {
-      if (isPaused) return;
       frameId = requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
 
-      // HOLOGRAPHIC CORE ANIMATION
-      core.rotation.y += 0.005;
-      core.rotation.z += 0.002;
-      coreWireframe.rotation.y -= 0.003;
-      coreWireframe.rotation.x += 0.001;
-
-      // Inner sphere breathing effect
-      const breatheScale = 1 + Math.sin(t * 2) * 0.05;
-      innerSphere.scale.setScalar(breatheScale);
-      (innerSphere.material as THREE.MeshStandardMaterial).emissiveIntensity =
-        1.5 + Math.sin(t * 3) * 0.3;
-
-      // Rings rotation
-      rings.forEach((ring, i) => {
-        ring.rotation.z += 0.005 * (i + 1);
-        ring.rotation.x += 0.002 * (i + 1);
+      // Network nodes floating
+      nodeMeshes.forEach((node) => {
+        node.position.y =
+          node.userData.basePosition.y +
+          Math.sin(t * node.userData.floatSpeed + node.userData.floatOffset) * 0.2;
       });
 
-      // Panel floating animation
-      panelGroup.position.y = Math.sin(t * 0.8) * 0.3;
-      panelGroup.rotation.y += 0.002;
+      // Connection lines subtle rotation
+      connectionLines.rotation.y = Math.sin(t * 0.1) * 0.05;
+      connectionLines.rotation.x = Math.cos(t * 0.08) * 0.03;
 
-      // Particles orbiting
-      particleData.forEach((data) => {
-        data.angle += data.orbitSpeed * 0.01;
-        data.mesh.position.x = Math.cos(data.angle) * data.orbitRadius;
-        data.mesh.position.z = Math.sin(data.angle) * data.orbitRadius;
-        data.mesh.position.y += Math.sin(t * 2 + data.angle) * 0.01;
-
-        // Twinkle effect
-        (data.mesh.material as THREE.MeshBasicMaterial).opacity =
-          0.4 + Math.sin(t * 3 + data.angle * 2) * 0.3;
+      // Floating accents rotation & movement
+      accents.forEach((accent) => {
+        accent.rotation.x += accent.userData.rotSpeedX;
+        accent.rotation.y += accent.userData.rotSpeedY;
+        accent.position.y =
+          accent.userData.baseY +
+          Math.sin(t * accent.userData.floatSpeed + accent.userData.floatOffset) * 0.3;
       });
 
-      // Energy beams pulsing
-      beams.forEach((beam, i) => {
-        beam.scale.y = 1 + Math.sin(t * 3 + i * 0.5) * 0.2;
-        (beam.material as THREE.MeshBasicMaterial).opacity =
-          0.3 + Math.sin(t * 2 + i * 0.8) * 0.2;
-      });
+      // Particles slow drift
+      particles.rotation.y = t * 0.02;
+      particles.rotation.x = t * 0.01;
 
-      // Glow sphere pulsing
-      (glowSphere.material as THREE.MeshBasicMaterial).opacity =
-        0.06 + Math.sin(t * 1.5) * 0.03;
-
-      // Mouse parallax untuk core
-      targetRotationY = mouseX * 0.4;
-      targetRotationX = -mouseY * 0.3;
-      holographicCore.rotation.y +=
-        (targetRotationY - holographicCore.rotation.y) * 0.05;
-      holographicCore.rotation.x +=
-        (targetRotationX - holographicCore.rotation.x) * 0.05;
-
-      // Floating objects animation
-      flyingMeshes.forEach((mesh) => {
-        mesh.position.y =
-          mesh.userData.basePosition.y +
-          Math.sin(
-            t * mesh.userData.floatSpeed + mesh.userData.floatOffset
-          ) *
-            mesh.userData.floatAmplitude;
-
-        mesh.position.x = mesh.userData.basePosition.x + mouseX * 0.4;
-        mesh.position.z = mesh.userData.basePosition.z + mouseY * 0.3;
-
-        mesh.rotation.x += mesh.userData.spinSpeed * 0.015;
-        mesh.rotation.y += mesh.userData.spinSpeed * 0.02;
-      });
+      // Camera parallax (smooth)
+      camera.position.x += (mouseX * 0.8 - camera.position.x) * 0.05;
+      camera.position.y += (-mouseY * 0.5 - camera.position.y) * 0.05;
+      camera.lookAt(0, 0, 0);
 
       renderer.render(scene, camera);
     };
@@ -456,23 +276,27 @@ export default function ThreeBackground() {
       cancelAnimationFrame(frameId);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
 
-      scene.traverse((child) => {
-        if (
-          child instanceof THREE.Mesh ||
-          child instanceof THREE.LineSegments
-        ) {
-          child.geometry.dispose();
-          if (Array.isArray(child.material)) {
-            child.material.forEach((m) => m.dispose());
-          } else {
-            child.material.dispose();
-          }
-        }
+      // Dispose nodes
+      nodeMeshes.forEach((mesh) => {
+        mesh.geometry.dispose();
+        (mesh.material as THREE.Material).dispose();
       });
 
-      pmremGenerator.dispose();
+      // Dispose lines
+      lineGeometry.dispose();
+      lineMaterial.dispose();
+
+      // Dispose accents
+      accents.forEach((mesh) => {
+        mesh.geometry.dispose();
+        (mesh.material as THREE.Material).dispose();
+      });
+
+      // Dispose particles
+      particleGeometry.dispose();
+      particleMaterial.dispose();
+
       renderer.dispose();
       if (container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
