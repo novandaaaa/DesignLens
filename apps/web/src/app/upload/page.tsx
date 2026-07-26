@@ -141,6 +141,7 @@ export default function UploadPage() {
               <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
                 {files.map((file, i) => (
                   <div key={i} className="relative w-20 h-20 shrink-0 rounded-lg overflow-hidden border border-border">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={URL.createObjectURL(file)} alt="preview" className="w-full h-full object-cover" />
                   </div>
                 ))}

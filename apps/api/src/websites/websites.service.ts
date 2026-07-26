@@ -14,7 +14,11 @@ export class WebsitesService {
     private readonly screenshotsService: ScreenshotsService,
   ) {}
 
-  async create(userId: string, dto: CreateWebsiteDto, files?: Express.Multer.File[]) {
+  async create(
+    userId: string,
+    dto: CreateWebsiteDto,
+    files?: Express.Multer.File[],
+  ) {
     const website = await this.prisma.website.create({
       data: {
         userId,
@@ -35,7 +39,10 @@ export class WebsitesService {
       // User uploaded manual screenshots
       for (const file of files) {
         try {
-          const filePath = await this.screenshotsService.saveUploadedFile(file, website.id);
+          const filePath = await this.screenshotsService.saveUploadedFile(
+            file,
+            website.id,
+          );
           await this.prisma.screenshot.create({
             data: {
               websiteId: website.id,
