@@ -43,7 +43,7 @@ export class AiReviewService {
     const envModel = this.configService.get<string>('OPENROUTER_MODEL');
     this.model =
       envModel === 'qwen/qwen3-coder:free' || !envModel
-        ? 'google/gemini-2.0-flash-exp:free' // model vision gratis yang valid
+        ? 'google/gemma-4-26b-a4b-it:free' // model vision gratis yang valid
         : envModel;
   }
 
@@ -253,14 +253,12 @@ export class AiReviewService {
     );
 
     if (!response.ok) {
-  const errorText = await response.text();
+      const errorText = await response.text();
 
-  console.error('OpenRouter Error:', errorText);
+      console.error('OpenRouter Error:', errorText);
 
-  throw new Error(
-    `OpenRouter API error ${response.status}: ${errorText}`,
-  );
-}
+      throw new Error(`OpenRouter API error ${response.status}: ${errorText}`);
+    }
 
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content;
