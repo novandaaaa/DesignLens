@@ -349,13 +349,13 @@ export default function LandingPage() {
                 step: '02',
                 title: 'Pilih Review',
                 desc: 'Pilih AI Review untuk evaluasi instan, Community Review untuk feedback publik, atau keduanya.',
-                icon: '',
+                icon: '🎯',
               },
               {
                 step: '03',
                 title: 'Dapatkan Feedback',
                 desc: 'Lihat skor AI per kategori dan diskusi komunitas. Gunakan insight untuk perbaikan desain.',
-                icon: '',
+                icon: '💬',
               },
             ].map((item, i) => (
               <div key={item.step} className="relative text-center group">
