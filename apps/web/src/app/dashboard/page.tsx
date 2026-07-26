@@ -46,8 +46,32 @@ export default function DashboardPage() {
 
   if (!isAuthenticated) return null;
 
+  const stats = [
+    {
+      label: 'Total Website',
+      value: websites.length,
+      icon: '🌐',
+      gradient: 'from-brand-500 to-purple-500',
+      glow: 'group-hover:shadow-brand-500/20',
+    },
+    {
+      label: 'AI Reviews',
+      value: websites.filter((w) => w.aiReview).length,
+      icon: '🤖',
+      gradient: 'from-purple-500 to-pink-500',
+      glow: 'group-hover:shadow-purple-500/20',
+    },
+    {
+      label: 'Community Posts',
+      value: websites.filter((w) => w.communityPost?.status === 'PUBLISHED').length,
+      icon: '👥',
+      gradient: 'from-accent-500 to-teal-500',
+      glow: 'group-hover:shadow-accent-500/20',
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       {/* Top Nav */}
       <nav className="border-b border-border bg-surface-0/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -83,10 +107,14 @@ export default function DashboardPage() {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 pt-4 pb-10">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
           <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-brand-500/20 bg-brand-500/5 text-brand-400 text-xs font-medium mb-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent-400 animate-pulse" />
+              Selamat datang kembali, {user?.name?.split(' ')[0]}
+            </div>
             <h1 className="text-3xl font-bold text-text-primary">Dashboard</h1>
             <p className="text-text-secondary mt-1">Kelola website dan lihat review Anda</p>
           </div>
@@ -102,14 +130,15 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          {[
-            { label: 'Total Website', value: websites.length, icon: '🌐' },
-            { label: 'AI Reviews', value: websites.filter((w) => w.aiReview).length, icon: '🤖' },
-            { label: 'Community Posts', value: websites.filter((w) => w.communityPost?.status === 'PUBLISHED').length, icon: '👥' },
-          ].map((stat) => (
-            <div key={stat.label} className="glass-card p-5 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-surface-100 flex items-center justify-center text-2xl">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+          {stats.map((stat) => (
+            <div
+              key={stat.label}
+              className={`glass-card p-5 flex items-center gap-4 hover:border-brand-500/30 hover:-translate-y-1 transition-all duration-300 group ${stat.glow} hover:shadow-lg`}
+            >
+              <div
+                className={`w-12 h-12 rounded-xl bg-linear-to-br ${stat.gradient} flex items-center justify-center text-2xl shrink-0 group-hover:scale-105 transition-transform duration-300`}
+              >
                 {stat.icon}
               </div>
               <div>
@@ -120,19 +149,30 @@ export default function DashboardPage() {
           ))}
         </div>
 
+        {/* Section divider label */}
+        <div className="flex items-center gap-3 mb-4">
+          <h2 className="text-sm font-semibold text-text-tertiary uppercase tracking-wide">
+            Website Anda
+          </h2>
+          <div className="h-px flex-1 bg-border" />
+        </div>
+
         {/* Websites List */}
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="w-8 h-8 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : websites.length === 0 ? (
-          <div className="glass-card p-12 text-center">
-            <div className="text-6xl mb-4">🚀</div>
+          <div className="glass-card p-12 text-center relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-brand-500 via-purple-500 to-pink-500" />
+            <div className="w-20 h-20 mx-auto mb-5 rounded-3xl bg-linear-to-br from-brand-500/10 to-purple-500/10 border border-brand-500/20 flex items-center justify-center text-5xl">
+              🚀
+            </div>
             <h2 className="text-xl font-bold text-text-primary mb-2">Belum ada website</h2>
             <p className="text-text-secondary mb-6">Upload website pertama Anda untuk mulai mendapatkan feedback</p>
             <Link
               href="/upload"
-              className="inline-block px-6 py-3 rounded-xl bg-linear-to-r from-brand-500 to-purple-500 text-white font-medium hover:shadow-lg hover:shadow-brand-500/25 transition-all duration-300"
+              className="inline-block px-6 py-3 rounded-xl bg-linear-to-r from-brand-500 to-purple-500 text-white font-medium hover:shadow-lg hover:shadow-brand-500/25 transition-all duration-300 hover:-translate-y-0.5"
             >
               Upload Website
             </Link>
@@ -143,7 +183,7 @@ export default function DashboardPage() {
               <Link
                 key={website.id}
                 href={`/review/${website.id}`}
-                className="glass-card p-5 flex flex-col sm:flex-row sm:items-center gap-4 hover:border-brand-500/30 transition-all duration-300 group"
+                className="glass-card p-5 flex flex-col sm:flex-row sm:items-center gap-4 hover:border-brand-500/30 hover:-translate-y-0.5 transition-all duration-300 group"
               >
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-text-primary group-hover:text-brand-400 transition-colors truncate">

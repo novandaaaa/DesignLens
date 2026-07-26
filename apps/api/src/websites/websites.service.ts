@@ -24,7 +24,7 @@ export class WebsitesService {
         userId,
         categoryId: dto.categoryId,
         title: dto.title,
-        url: dto.url,
+        url: dto.url ?? '',
         description: dto.description,
         targetAudience: dto.targetAudience,
         feedbackFocus: dto.feedbackFocus,

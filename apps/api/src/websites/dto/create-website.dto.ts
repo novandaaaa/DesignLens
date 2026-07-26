@@ -9,14 +9,14 @@ import {
 export class CreateWebsiteDto {
   @IsString()
   @MaxLength(200)
-  title: string;
+  title!: string;
 
   @IsOptional()
   @IsUrl()
   url?: string;
 
   @IsUUID()
-  categoryId: string;
+  categoryId!: string;
 
   @IsOptional()
   @IsString()
