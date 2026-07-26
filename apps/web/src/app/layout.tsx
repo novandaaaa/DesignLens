@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import GlobalBackground from "@/components/GlobalBackground";
-import TargetCursor from "@/components/TargetCursor";
+import GlobalHyperspeed from "@/components/GlobalHyperSpeed";
 
 const inter = Inter({
   variable: "--font-geist-sans",
@@ -24,27 +24,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id" className={`${inter.variable} dark`}>
-      <body className="min-h-screen bg-background text-foreground font-sans antialiased cursor-none">
-        {/* 
-          Catatan: 
-          - 'color' menggantikan 'cursorColor'
-          - 'mixBlendMode' bisa digunakan untuk efek blending (default: 'screen')
-          - Cursor default disembunyikan menggunakan class 'cursor-none' pada body
-        */}
-        <TargetCursor
-          color="#7dd3fc"
-          trailLength={50}
-          inertia={0.5}
-          bloomStrength={0.15}
-          bloomRadius={1.0}
-          mixBlendMode="screen"
-          zIndex={50}
-        />
-        
+      <body className="min-h-screen bg-background text-foreground font-sans antialiased">
+        <GlobalHyperspeed />
         <GlobalBackground />
-        <div className="relative z-10">
-          <AuthProvider>{children}</AuthProvider>
-        </div>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
