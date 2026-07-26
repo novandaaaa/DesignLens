@@ -1,6 +1,3 @@
-// DesignLens AI — Prisma Schema
-// Platform Evaluasi UI/UX Website Berbasis AI dan Community Review
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,7 +6,138 @@ datasource db {
   provider = "postgresql"
 }
 
-// ==================== ENUMS ====================
+model User {
+  id            String         @id @default(uuid())
+  name          String
+  email         String         @unique
+  passwordHash  String         @map("password_hash")
+  avatar        String?
+  role          Role           @default(USER)
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  comments      Comment[]
+  likes         Like[]
+  notifications Notification[]
+  websites      Website[]
+
+  @@map("users")
+}
+
+model Category {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  slug     String    @unique
+  websites Website[]
+
+  @@map("categories")
+}
+
+model Website {
+  id             String         @id @default(uuid())
+  userId         String         @map("user_id")
+  categoryId     String         @map("category_id")
+  title          String
+  url            String?
+  description    String?
+  targetAudience String?        @map("target_audience")
+  feedbackFocus  String?        @map("feedback_focus")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  aiReview       AiReview?
+  communityPost  CommunityPost?
+  screenshots    Screenshot[]
+  category       Category       @relation(fields: [categoryId], references: [id])
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("websites")
+}
+
+model Screenshot {
+  id        String   @id @default(uuid())
+  websiteId String   @map("website_id")
+  fileUrl   String   @map("file_url")
+  type      String   @default("auto")
+  createdAt DateTime @default(now()) @map("created_at")
+  website   Website  @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@map("screenshots")
+}
+
+model AiReview {
+  id                 String       @id @default(uuid())
+  websiteId          String       @unique @map("website_id")
+  status             ReviewStatus @default(PENDING)
+  layoutScore        Int?         @map("layout_score")
+  typographyScore    Int?         @map("typography_score")
+  colorScore         Int?         @map("color_score")
+  navigationScore    Int?         @map("navigation_score")
+  ctaScore           Int?         @map("cta_score")
+  accessibilityScore Int?         @map("accessibility_score")
+  overallScore       Int?         @map("overall_score")
+  reasoning          Json?
+  recommendation     String?
+  modelUsed          String?      @map("model_used")
+  createdAt          DateTime     @default(now()) @map("created_at")
+  updatedAt          DateTime     @updatedAt @map("updated_at")
+  website            Website      @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@map("ai_reviews")
+}
+
+model CommunityPost {
+  id          String     @id @default(uuid())
+  websiteId   String     @unique @map("website_id")
+  status      PostStatus @default(DRAFT)
+  publishedAt DateTime?  @map("published_at")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  comments    Comment[]
+  website     Website    @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@map("community_posts")
+}
+
+model Comment {
+  id              String        @id @default(uuid())
+  postId          String        @map("post_id")
+  userId          String        @map("user_id")
+  parentCommentId String?       @map("parent_comment_id")
+  content         String
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  parentComment   Comment?      @relation("CommentReplies", fields: [parentCommentId], references: [id])
+  replies         Comment[]     @relation("CommentReplies")
+  post            CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likes           Like[]
+
+  @@map("comments")
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  commentId String   @map("comment_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, commentId])
+  @@map("likes")
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String           @map("user_id")
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false) @map("is_read")
+  link      String?
+  createdAt DateTime         @default(now()) @map("created_at")
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
 
 enum Role {
   USER
@@ -34,164 +162,4 @@ enum NotificationType {
   REPLY
   AI_REVIEW_COMPLETE
   SYSTEM
-}
-
-// ==================== MODELS ====================
-
-model User {
-  id           String   @id @default(uuid())
-  name         String
-  email        String   @unique
-  passwordHash String   @map("password_hash")
-  avatar       String?
-  role         Role     @default(USER)
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  websites      Website[]
-  comments      Comment[]
-  likes         Like[]
-  notifications Notification[]
-
-  @@map("users")
-}
-
-model Category {
-  id   String @id @default(uuid())
-  name String @unique
-  slug String @unique
-
-  // Relations
-  websites Website[]
-
-  @@map("categories")
-}
-
-model Website {
-  id             String   @id @default(uuid())
-  userId         String   @map("user_id")
-  categoryId     String   @map("category_id")
-  title          String
-  url            String?
-  description    String?
-  targetAudience String?  @map("target_audience")
-  feedbackFocus  String?  @map("feedback_focus")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category       Category       @relation(fields: [categoryId], references: [id])
-  screenshots    Screenshot[]
-  aiReview       AiReview?
-  communityPost  CommunityPost?
-
-  @@map("websites")
-}
-
-model Screenshot {
-  id        String   @id @default(uuid())
-  websiteId String   @map("website_id")
-  fileUrl   String   @map("file_url")
-  type      String   @default("auto") // "auto" (Playwright) atau "manual" (upload)
-  createdAt DateTime @default(now()) @map("created_at")
-
-  // Relations
-  website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
-
-  @@map("screenshots")
-}
-
-model AiReview {
-  id                String       @id @default(uuid())
-  websiteId         String       @unique @map("website_id")
-  status            ReviewStatus @default(PENDING)
-  
-  // Skor per kategori (0-100)
-  layoutScore       Int?         @map("layout_score")
-  typographyScore   Int?         @map("typography_score")
-  colorScore        Int?         @map("color_score")
-  navigationScore   Int?         @map("navigation_score")
-  ctaScore          Int?         @map("cta_score")
-  accessibilityScore Int?        @map("accessibility_score")
-  overallScore      Int?         @map("overall_score")
-
-  // JSON terstruktur per kategori
-  // Format: {"layout": {"score": 85, "reasoning": "...", "recommendations": ["..."]}, ...}
-  reasoning         Json?
-  recommendation    String?      @db.Text
-
-  modelUsed         String?      @map("model_used")
-  createdAt         DateTime     @default(now()) @map("created_at")
-  updatedAt         DateTime     @updatedAt @map("updated_at")
-
-  // Relations
-  website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
-
-  @@map("ai_reviews")
-}
-
-model CommunityPost {
-  id          String     @id @default(uuid())
-  websiteId   String     @unique @map("website_id")
-  status      PostStatus @default(DRAFT)
-  publishedAt DateTime?  @map("published_at")
-  createdAt   DateTime   @default(now()) @map("created_at")
-
-  // Relations
-  website  Website   @relation(fields: [websiteId], references: [id], onDelete: Cascade)
-  comments Comment[]
-
-  @@map("community_posts")
-}
-
-model Comment {
-  id              String   @id @default(uuid())
-  postId          String   @map("post_id")
-  userId          String   @map("user_id")
-  parentCommentId String?  @map("parent_comment_id")
-  content         String   @db.Text
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  post          CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  parentComment Comment?      @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: SetNull)
-  replies       Comment[]     @relation("CommentReplies")
-  likes         Like[]
-
-  @@map("comments")
-}
-
-model Like {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  commentId String   @map("comment_id")
-  createdAt DateTime @default(now()) @map("created_at")
-
-  // Relations
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
-
-  // Prevent double-like
-  @@unique([userId, commentId])
-  @@map("likes")
-}
-
-model Notification {
-  id        String           @id @default(uuid())
-  userId    String           @map("user_id")
-  type      NotificationType
-  title     String
-  message   String
-  isRead    Boolean          @default(false) @map("is_read")
-  link      String?
-  createdAt DateTime         @default(now()) @map("created_at")
-
-  // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("notifications")
 }
