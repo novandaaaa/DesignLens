@@ -24,14 +24,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id" className={`${inter.variable} dark`}>
-      <body className="min-h-screen bg-background text-foreground font-sans antialiased">
+      <body className="min-h-screen bg-background text-foreground font-sans antialiased cursor-none">
+        {/* 
+          Catatan: 
+          - 'color' menggantikan 'cursorColor'
+          - 'mixBlendMode' bisa digunakan untuk efek blending (default: 'screen')
+          - Cursor default disembunyikan menggunakan class 'cursor-none' pada body
+        */}
         <TargetCursor
-          spinDuration={2}
-          hideDefaultCursor={true}
-          parallaxOn={true}
-          cursorColor="#7dd3fc"
-          cursorColorOnTarget="#f472b6"
-        /> {/* ⬅️ tambahkan ini, di luar div z-10 juga tidak masalah */}
+          color="#7dd3fc"
+          trailLength={50}
+          inertia={0.5}
+          bloomStrength={0.15}
+          bloomRadius={1.0}
+          mixBlendMode="screen"
+          zIndex={50}
+        />
+        
         <GlobalBackground />
         <div className="relative z-10">
           <AuthProvider>{children}</AuthProvider>

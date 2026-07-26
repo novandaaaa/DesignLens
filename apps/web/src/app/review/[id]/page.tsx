@@ -124,6 +124,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
   const reasoning = review?.reasoning as Record<string, any> | null;
 
+  // Tombol AI Review muncul kalau: belum pernah ada review sama sekali,
+  // ATAU review sebelumnya berstatus FAILED (butuh retry).
+  const showAiButton = !review || review.status === 'FAILED';
+
   return (
     <div className="min-h-screen">
       <nav className="border-b border-border bg-surface-0/80 backdrop-blur-xl sticky top-0 z-50"></nav>
@@ -157,13 +161,17 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           </div>
 
           <div className="flex gap-3">
-            {!review && (
+            {showAiButton && (
               <button
                 onClick={handleTriggerAi}
                 disabled={triggeringAi}
                 className="px-4 py-2 rounded-xl bg-linear-to-r from-brand-500 to-purple-500 text-white text-sm font-medium hover:shadow-lg transition-all disabled:opacity-50"
               >
-                {triggeringAi ? 'Processing...' : '🤖 AI Review'}
+                {triggeringAi
+                  ? 'Processing...'
+                  : review?.status === 'FAILED'
+                  ? '🔄 Coba Lagi'
+                  : '🤖 AI Review'}
               </button>
             )}
             {!website.communityPost && (
@@ -279,6 +287,17 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             <button onClick={loadWebsite} className="mt-4 text-sm text-brand-400 hover:underline">
               Refresh
             </button>
+          </div>
+        )}
+
+        {/* Failed State */}
+        {review && review.status === 'FAILED' && (
+          <div className="glass-card p-12 text-center">
+            <div className="text-5xl mb-4">⚠️</div>
+            <h2 className="text-xl font-bold text-text-primary mb-2">AI Review Gagal</h2>
+            <p className="text-text-secondary">
+              Terjadi kesalahan saat menganalisis website ini. Silakan klik tombol &quot;Coba Lagi&quot; di atas untuk mencoba ulang.
+            </p>
           </div>
         )}
 

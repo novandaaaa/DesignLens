@@ -41,10 +41,10 @@ export class AiReviewService {
     this.apiKey = this.configService.get<string>('OPENROUTER_API_KEY', '');
     // Gunakan model vision secara default jika tidak ada, atau biarkan pakai yang ada di env
     const envModel = this.configService.get<string>('OPENROUTER_MODEL');
-    this.model =
-      envModel === 'qwen/qwen3-coder:free' || !envModel
-        ? 'google/gemini-2.5-flash:free' // model vision gratis
-        : envModel;
+      this.model =
+  envModel === 'qwen/qwen3-coder:free' || !envModel
+    ? 'google/gemma-4-31b-it:free' // model vision gratis
+    : envModel;
   }
 
   async createReview(websiteId: string, userId: string) {
@@ -232,10 +232,14 @@ export class AiReviewService {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `OpenRouter API error: ${response.status} ${response.statusText}`,
-      );
-    }
+  const errorText = await response.text();
+
+  console.error('OpenRouter Error:', errorText);
+
+  throw new Error(
+    `OpenRouter API error ${response.status}: ${errorText}`,
+  );
+}
 
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content;
