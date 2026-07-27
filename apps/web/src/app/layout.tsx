@@ -1,12 +1,25 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Orbitron, Rajdhani, Exo_2 } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
-import GlobalBackground from "@/components/GlobalBackground";
-import GlobalHyperspeed from "@/components/GlobalHyperSpeed";
+import TargetCursor from "@/components/TargetCursor";
+import Dither from "@/components/Dither";
 
-const inter = Inter({
-  variable: "--font-geist-sans",
+import SmoothScroll from "@/components/SmoothScroll";
+
+const orbitron = Orbitron({
+  variable: "--font-orbitron",
+  subsets: ["latin"],
+});
+
+const rajdhani = Rajdhani({
+  variable: "--font-rajdhani",
+  weight: ["300", "400", "500", "600", "700"],
+  subsets: ["latin"],
+});
+
+const exo2 = Exo_2({
+  variable: "--font-exo2",
   subsets: ["latin"],
 });
 
@@ -23,11 +36,26 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className={`${inter.variable} dark`}>
-      <body className="min-h-screen bg-background text-foreground font-sans antialiased">
-        <GlobalHyperspeed />
-        <GlobalBackground />
-        <AuthProvider>{children}</AuthProvider>
+    <html lang="id" className={`${orbitron.variable} ${rajdhani.variable} ${exo2.variable} dark`}>
+      <body className="min-h-screen bg-transparent text-foreground font-sans antialiased">
+        <SmoothScroll>
+          <AuthProvider>
+            <div className="fixed inset-0 -z-50 pointer-events-none">
+              <Dither
+                waveColor={[0.6, 0.3, 0.9]}
+                disableAnimation={false}
+                enableMouseInteraction={true}
+                mouseRadius={0.5}
+                colorNum={4}
+                waveAmplitude={0.4}
+                waveFrequency={4}
+                waveSpeed={0.05}
+              />
+            </div>
+            <TargetCursor />
+            {children}
+          </AuthProvider>
+        </SmoothScroll>
       </body>
     </html>
   );

@@ -249,7 +249,7 @@ export default function UploadPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-xl bg-linear-to-r from-brand-500 to-purple-500 text-white font-semibold text-lg hover:shadow-lg hover:shadow-brand-500/25 transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3.5 rounded-xl bg-linear-to-r from-brand-500 to-brand-400 text-white font-semibold text-lg hover:shadow-lg hover:shadow-brand-500/25 transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Memproses...' : 'Upload & Mulai Review'}
           </button>

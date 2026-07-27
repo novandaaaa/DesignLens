@@ -165,7 +165,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               <button
                 onClick={handleTriggerAi}
                 disabled={triggeringAi}
-                className="px-4 py-2 rounded-xl bg-linear-to-r from-brand-500 to-purple-500 text-white text-sm font-medium hover:shadow-lg transition-all disabled:opacity-50"
+                className="px-4 py-2 rounded-xl bg-linear-to-r from-brand-500 to-brand-400 text-white text-sm font-medium hover:shadow-lg transition-all disabled:opacity-50"
               >
                 {triggeringAi
                   ? 'Processing...'

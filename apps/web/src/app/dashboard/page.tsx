@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
+import ScrollFloat from '@/components/ScrollFloat';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function DashboardPage() {
   const loadWebsites = useCallback(async () => {
     try {
       const data = await api.getMyWebsites();
-      setWebsites(data);
+      setWebsites(data.data);
     } catch (error) {
       console.error('Failed to load websites:', error);
     } finally {
@@ -51,22 +52,28 @@ export default function DashboardPage() {
       label: 'Total Website',
       value: websites.length,
       icon: '🌐',
-      gradient: 'from-brand-500 to-purple-500',
+      gradient: 'from-brand-500 to-brand-400',
       glow: 'group-hover:shadow-brand-500/20',
     },
     {
       label: 'AI Reviews',
       value: websites.filter((w) => w.aiReview).length,
-      icon: '🤖',
-      gradient: 'from-purple-500 to-pink-500',
-      glow: 'group-hover:shadow-purple-500/20',
+      icon: 'AI',
+      gradient: 'from-accent-500 to-emerald-400',
+      glow: 'group-hover:shadow-accent-500/20',
     },
     {
-      label: 'Community Posts',
-      value: websites.filter((w) => w.communityPost?.status === 'PUBLISHED').length,
-      icon: '👥',
-      gradient: 'from-accent-500 to-teal-500',
-      glow: 'group-hover:shadow-accent-500/20',
+      label: 'Avg. Score',
+      value:
+        websites.length > 0
+          ? Math.round(
+              websites.reduce((acc, curr) => acc + (curr.aiReview?.score || 0), 0) /
+                websites.filter((w) => w.aiReview).length || 0
+            )
+          : 0,
+      icon: '📈',
+      gradient: 'from-blue-500 to-cyan-400',
+      glow: 'group-hover:shadow-blue-500/20',
     },
   ];
 
@@ -76,7 +83,7 @@ export default function DashboardPage() {
       <nav className="border-b border-border bg-surface-0/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-brand-500 to-purple-500 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-brand-500 to-brand-400 flex items-center justify-center">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="3" />
                 <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
@@ -92,7 +99,7 @@ export default function DashboardPage() {
               Komunitas
             </Link>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-linear-to-br from-brand-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+              <div className="w-8 h-8 rounded-full bg-linear-to-br from-brand-500 to-brand-400 flex items-center justify-center text-white text-xs font-bold">
                 {user?.name?.charAt(0)?.toUpperCase()}
               </div>
               <span className="text-sm text-text-primary font-medium hidden sm:block">{user?.name}</span>
@@ -115,12 +122,14 @@ export default function DashboardPage() {
               <span className="w-1.5 h-1.5 rounded-full bg-accent-400 animate-pulse" />
               Selamat datang kembali, {user?.name?.split(' ')[0]}
             </div>
-            <h1 className="text-3xl font-bold text-text-primary">Dashboard</h1>
+            <h1 className="text-3xl font-bold text-text-primary flex">
+              <ScrollFloat textClassName="text-text-primary" stagger={0.03} animationDuration={1}>Dashboard</ScrollFloat>
+            </h1>
             <p className="text-text-secondary mt-1">Kelola website dan lihat review Anda</p>
           </div>
           <Link
             href="/upload"
-            className="px-5 py-2.5 rounded-xl bg-linear-to-r from-brand-500 to-purple-500 text-white font-medium text-sm hover:shadow-lg hover:shadow-brand-500/25 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2"
+            className="px-5 py-2.5 rounded-xl bg-linear-to-r from-brand-500 to-brand-400 text-white font-medium text-sm hover:shadow-lg hover:shadow-brand-500/25 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 5v14M5 12h14" />
@@ -165,14 +174,14 @@ export default function DashboardPage() {
         ) : websites.length === 0 ? (
           <div className="glass-card p-12 text-center relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-brand-500 via-purple-500 to-pink-500" />
-            <div className="w-20 h-20 mx-auto mb-5 rounded-3xl bg-linear-to-br from-brand-500/10 to-purple-500/10 border border-brand-500/20 flex items-center justify-center text-5xl">
+            <div className="w-20 h-20 mx-auto mb-5 rounded-3xl bg-linear-to-br from-brand-500/10 to-brand-400/10 border border-brand-500/20 flex items-center justify-center text-5xl">
               🚀
             </div>
             <h2 className="text-xl font-bold text-text-primary mb-2">Belum ada website</h2>
             <p className="text-text-secondary mb-6">Upload website pertama Anda untuk mulai mendapatkan feedback</p>
             <Link
               href="/upload"
-              className="inline-block px-6 py-3 rounded-xl bg-linear-to-r from-brand-500 to-purple-500 text-white font-medium hover:shadow-lg hover:shadow-brand-500/25 transition-all duration-300 hover:-translate-y-0.5"
+              className="inline-block px-6 py-3 rounded-xl bg-linear-to-r from-brand-500 to-brand-400 text-white font-medium hover:shadow-lg hover:shadow-brand-500/25 transition-all duration-300 hover:-translate-y-0.5"
             >
               Upload Website
             </Link>
