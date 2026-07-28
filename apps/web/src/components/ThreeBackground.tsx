@@ -230,7 +230,7 @@ export default function ThreeBackground() {
       new THREE.MeshBasicMaterial({
         color: 0x7c3aed,
         transparent: true,
-        opacity: 0.15,
+        opacity: 0.05,
         blending: THREE.AdditiveBlending,
         depthWrite: false,
       })
