@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import ThreeBackground from '@/components/ThreeBackground';
-import HyperspeedBackground from '@/components/HyperspeedBackground';
+//import HyperspeedBackground from '@/components/HyperspeedBackground';
 
 export default function LandingPage() {
   const { isAuthenticated } = useAuth();
@@ -26,7 +26,7 @@ export default function LandingPage() {
   return (
     <div className="relative min-h-screen overflow-hidden">
       {/* Lapisan background */}
-      <HyperspeedBackground />
+      {/* <HyperspeedBackground /> */}
       <ThreeBackground />
       <div className="fixed inset-0 -z-10 bg-linear-to-b from-[#0F172A]/40 via-transparent to-[#0F172A]/60" />
 
