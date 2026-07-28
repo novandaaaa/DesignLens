@@ -80,7 +80,7 @@ export default function ThreeBackground() {
 
     const frontLight = new THREE.DirectionalLight(0xffffff, 0.5);
     frontLight.position.set(0, 0, 5);
-    scene.add(frontLight);
+    //scene.add(frontLight);
 
     // ---------------------------------------
     // WEBSITE GROUP (Mockup Monitor Premium)
