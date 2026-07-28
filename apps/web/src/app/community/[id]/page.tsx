@@ -97,7 +97,7 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
         {/* Post Header */}
         <div className="glass-card p-6 mb-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-linear-to-br from-brand-500 to-purple-500 flex items-center justify-center text-white text-sm font-bold">
+            <div className="w-10 h-10 rounded-full bg-linear-to-br from-brand-500 to-brand-400 flex items-center justify-center text-white text-sm font-bold">
               {post.website?.user?.name?.charAt(0)?.toUpperCase()}
             </div>
             <div>
@@ -139,7 +139,7 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
               <button
                 type="submit"
                 disabled={submitting || !comment.trim()}
-                className="px-5 py-2 rounded-xl bg-linear-to-r from-brand-500 to-purple-500 text-white text-sm font-medium hover:shadow-lg transition-all disabled:opacity-50"
+                className="px-5 py-2 rounded-xl bg-linear-to-r from-brand-500 to-brand-400 text-white text-sm font-medium hover:shadow-lg transition-all disabled:opacity-50"
               >
                 {submitting ? 'Mengirim...' : 'Kirim Komentar'}
               </button>

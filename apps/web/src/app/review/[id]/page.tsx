@@ -165,7 +165,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               <button
                 onClick={handleTriggerAi}
                 disabled={triggeringAi}
-                className="px-4 py-2 rounded-xl bg-linear-to-r from-brand-500 to-purple-500 text-white text-sm font-medium hover:shadow-lg transition-all disabled:opacity-50"
+                className="px-4 py-2 rounded-xl bg-linear-to-r from-brand-500 to-brand-400 text-white text-sm font-medium hover:shadow-lg transition-all disabled:opacity-50"
               >
                 {triggeringAi
                   ? 'Processing...'
@@ -292,12 +292,13 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
         {/* Failed State */}
         {review && review.status === 'FAILED' && (
-          <div className="glass-card p-12 text-center">
-            <div className="text-5xl mb-4">⚠️</div>
-            <h2 className="text-xl font-bold text-text-primary mb-2">AI Review Gagal</h2>
-            <p className="text-text-secondary">
-              Terjadi kesalahan saat menganalisis website ini. Silakan klik tombol &quot;Coba Lagi&quot; di atas untuk mencoba ulang.
-            </p>
+          <div className="glass-card p-12 text-center border-red-500/20">
+            <div className="text-5xl mb-4">❌</div>
+            <h2 className="text-xl font-bold text-red-400 mb-2">Proses AI Gagal</h2>
+            <p className="text-text-secondary mb-6">Terjadi kesalahan saat memproses review (mungkin API key tidak valid atau website tidak dapat diakses).</p>
+            <button onClick={handleTriggerAi} disabled={triggeringAi} className="px-4 py-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 font-medium transition-all">
+              {triggeringAi ? 'Mencoba lagi...' : 'Coba Lagi'}
+            </button>
           </div>
         )}
 

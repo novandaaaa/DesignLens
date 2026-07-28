@@ -41,10 +41,10 @@ export class AiReviewService {
     this.apiKey = this.configService.get<string>('OPENROUTER_API_KEY', '');
     // Gunakan model vision secara default jika tidak ada, atau biarkan pakai yang ada di env
     const envModel = this.configService.get<string>('OPENROUTER_MODEL');
-      this.model =
-  envModel === 'qwen/qwen3-coder:free' || !envModel
-    ? 'google/gemma-4-31b-it:free' // model vision gratis
-    : envModel;
+    this.model =
+      envModel === 'qwen/qwen3-coder:free' || !envModel
+        ? 'google/gemma-4-26b-a4b-it:free' // model vision gratis yang valid
+        : envModel;
   }
 
   async createReview(websiteId: string, userId: string) {
@@ -88,15 +88,35 @@ export class AiReviewService {
     });
 
     // Process in background (non-blocking)
-    this.processReview(websiteId, website.url, website.description ?? '').catch(
-      (error) => {
+    void (async () => {
+      try {
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(
+            () =>
+              reject(new Error('AI Review process timed out after 90 seconds')),
+            90000,
+          ),
+        );
+
+        await Promise.race([
+          this.processReview(websiteId, website.url, website.description ?? ''),
+          timeoutPromise,
+        ]);
+      } catch (error) {
         console.error(`AI Review failed for website ${websiteId}:`, error);
-        void this.prisma.aiReview.update({
-          where: { websiteId },
-          data: { status: 'FAILED' },
-        });
-      },
-    );
+        try {
+          await this.prisma.aiReview.update({
+            where: { websiteId },
+            data: { status: 'FAILED' },
+          });
+        } catch (dbError) {
+          console.error(
+            'Failed to update AI Review status to FAILED in DB:',
+            dbError,
+          );
+        }
+      }
+    })();
 
     return {
       message: 'AI Review sedang diproses',
@@ -228,18 +248,17 @@ export class AiReviewService {
           temperature: 0.3,
           max_tokens: 4000,
         }),
+        signal: AbortSignal.timeout(60000), // Timeout 60 detik agar tidak stuck berjam-jam
       },
     );
 
     if (!response.ok) {
-  const errorText = await response.text();
+      const errorText = await response.text();
 
-  console.error('OpenRouter Error:', errorText);
+      console.error('OpenRouter Error:', errorText);
 
-  throw new Error(
-    `OpenRouter API error ${response.status}: ${errorText}`,
-  );
-}
+      throw new Error(`OpenRouter API error ${response.status}: ${errorText}`);
+    }
 
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content;

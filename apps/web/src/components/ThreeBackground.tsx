@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
-export default function ThreeBackground() {
+export default function ThreeBackground({ contained = false }: { contained?: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -476,7 +476,7 @@ export default function ThreeBackground() {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 -z-10 pointer-events-none"
+      className={contained ? 'absolute inset-0 pointer-events-none' : 'fixed inset-0 -z-10 pointer-events-none'}
       aria-hidden="true"
     />
   );

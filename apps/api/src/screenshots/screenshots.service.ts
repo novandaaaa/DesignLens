@@ -39,11 +39,11 @@ export class ScreenshotsService {
 
       const page = await context.newPage();
 
-      // Navigate to the page and wait for it to load
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+      // Navigate to the page and wait for it to load (faster than networkidle)
+      await page.goto(url, { waitUntil: 'load', timeout: 15000 });
 
       // Small delay to allow any animations or lazy-loaded images to settle
-      await page.waitForTimeout(2000);
+      await page.waitForTimeout(1000);
 
       const fileName = `${websiteId}-${Date.now()}.png`;
       const absoluteDir = path.resolve(process.cwd(), this.screenshotDir);
@@ -67,14 +67,15 @@ export class ScreenshotsService {
       }
     }
   }
-  async saveUploadedFile(file: Express.Multer.File, websiteId: string): Promise<string> {
+  async saveUploadedFile(
+    file: Express.Multer.File,
+    websiteId: string,
+  ): Promise<string> {
     const fileName = `${websiteId}-manual-${Date.now()}${path.extname(file.originalname) || '.png'}`;
     const absoluteDir = path.resolve(process.cwd(), this.screenshotDir);
     const filePath = path.join(absoluteDir, fileName);
-    
-    fs.writeFileSync(filePath, file.buffer);
+    await fs.promises.writeFile(filePath, file.buffer);
     this.logger.log(`Manual screenshot saved successfully: ${filePath}`);
-    
     return `/screenshots/${fileName}`;
   }
 }
