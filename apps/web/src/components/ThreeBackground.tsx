@@ -80,7 +80,7 @@ export default function ThreeBackground() {
 
     const frontLight = new THREE.DirectionalLight(0xffffff, 0.5);
     frontLight.position.set(0, 0, 5);
-    //scene.add(frontLight);
+    scene.add(frontLight);
 
     // ---------------------------------------
     // WEBSITE GROUP (Mockup Monitor Premium)
@@ -230,7 +230,7 @@ export default function ThreeBackground() {
       new THREE.MeshBasicMaterial({
         color: 0x7c3aed,
         transparent: true,
-        opacity: 0.03,
+        opacity: 0.15,
         blending: THREE.AdditiveBlending,
         depthWrite: false,
       })
@@ -415,15 +415,15 @@ export default function ThreeBackground() {
       // Monitor melayang + smooth lerp
       website.position.y = Math.sin(t * 1.0) * 0.2;
       
-      targetRotationY = mouseX * 0.3;
-      targetRotationX = -mouseY * 0.2;
+      // targetRotationY = mouseX * 0.3;
+      // targetRotationX = -mouseY * 0.2;
       
-      website.rotation.y += (targetRotationY - website.rotation.y) * 0.05;
-      website.rotation.x += (targetRotationX - website.rotation.x) * 0.05;
+      // website.rotation.y += (targetRotationY - website.rotation.y) * 0.05;
+      // website.rotation.x += (targetRotationX - website.rotation.x) * 0.05;
       website.rotation.z = Math.sin(t * 0.8) * 0.015;
 
       // Glow berdenyut
-      (glow.material as THREE.MeshBasicMaterial).opacity = 0.02 + Math.sin(t * 1.5) * 0.01;
+      (glow.material as THREE.MeshBasicMaterial).opacity = 0.12 + Math.sin(t * 1.5) * 0.05;
 
       // Scan line
       const scanY = 2.2 - ((t * 1.2) % 4.4);
