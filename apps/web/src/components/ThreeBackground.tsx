@@ -35,7 +35,11 @@ export default function ThreeBackground() {
       0.1,
       1000
     );
-    camera.position.set(0, 0, 14);
+    if (isMobile) {
+  camera.position.set(0, 1, 18);
+} else {
+  camera.position.set(0, 0, 14);
+}
 
     // ---------------------------------------
     // RENDERER (Dipindah ke atas sebelum environment)
@@ -83,6 +87,13 @@ export default function ThreeBackground() {
     // ---------------------------------------
     const website = new THREE.Group();
     scene.add(website);
+
+    if (isMobile) {
+  website.scale.set(0.65, 0.65, 0.65);
+  website.position.y = 1.2;
+} else {
+  website.scale.set(1, 1, 1);
+}
 
     // Material Kaca Modern (Glassmorphism)
     const glassMaterial = new THREE.MeshPhysicalMaterial({
