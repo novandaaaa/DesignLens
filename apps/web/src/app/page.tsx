@@ -258,6 +258,36 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Mobile Score Cards */}
+      <div className="lg:hidden px-6 -mt-8 mb-16">
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { label: "Color", value: 78, color: "bg-fuchsia-400" },
+            { label: "Layout", value: 92, color: "bg-indigo-400" },
+            { label: "CTA", value: 71, color: "bg-yellow-400" },
+            { label: "Typography", value: 85, color: "bg-teal-400" },
+            { label: "Accessibility", value: 88, color: "bg-pink-400" },
+            { label: "Navigation", value: 88, color: "bg-purple-400" },
+          ].map((item) => (
+            <div
+              key={item.label}
+              className="glass-card px-4 py-3 flex items-center gap-3"
+            >
+              <span className={`w-2 h-2 rounded-full ${item.color}`} />
+              <div>
+                <div className="text-xs text-text-tertiary">
+                  {item.label}
+                </div>
+                <div className="text-lg font-bold text-text-primary">
+                  {item.value}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+
       {/* Features Section - tetap sama */}
       <section id="features" className="py-24 px-6">
         <div className="max-w-6xl mx-auto">
