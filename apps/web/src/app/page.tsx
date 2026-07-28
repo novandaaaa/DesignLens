@@ -11,23 +11,35 @@ export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  setMounted(true);
+
+  const checkMobile = () => {
+    setIsMobile(window.innerWidth < 768);
+  };
+
+  checkMobile();
+
+  const handleScroll = () => {
+    setScrolled(window.scrollY > 50);
+  };
+
+  window.addEventListener('scroll', handleScroll);
+  window.addEventListener('resize', checkMobile);
+
+  return () => {
+    window.removeEventListener('scroll', handleScroll);
+    window.removeEventListener('resize', checkMobile);
+  };
+}, []);
 
   return (
     <div className="relative min-h-screen overflow-hidden">
       {/* Lapisan background */}
       {/* <HyperspeedBackground /> */}
-      <ThreeBackground />
+      {!isMobile && <ThreeBackground />}
       <div className="fixed inset-0 -z-10 bg-linear-to-b from-[#0F172A]/40 via-transparent to-[#0F172A]/60" />
 
       {/* ✨ FLOATING NAVBAR - Konsep Baru */}
