@@ -22,9 +22,10 @@ export default function DashboardPage() {
   const loadWebsites = useCallback(async () => {
     try {
       const data = await api.getMyWebsites();
-      setWebsites(data.data);
+      setWebsites(data || []);
     } catch (error) {
       console.error('Failed to load websites:', error);
+      setWebsites([]);
     } finally {
       setLoading(false);
     }
@@ -40,39 +41,41 @@ export default function DashboardPage() {
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#c1f02a] border-t-transparent cyber-cut-sm animate-spin" />
       </div>
     );
   }
 
   if (!isAuthenticated) return null;
 
+  const safeWebsites = websites || [];
+
   const stats = [
     {
       label: 'Total Website',
-      value: websites.length,
+      value: safeWebsites.length,
       icon: '🌐',
-      gradient: 'from-brand-500 to-brand-400',
-      glow: 'group-hover:shadow-brand-500/20',
+      color: 'bg-[#c1f02a]',
+      glow: 'group-hover:shadow-[#c1f02a]/20',
     },
     {
       label: 'AI Reviews',
-      value: websites.filter((w) => w.aiReview).length,
+      value: safeWebsites.filter((w: any) => w.aiReview).length,
       icon: 'AI',
-      gradient: 'from-accent-500 to-emerald-400',
+      color: 'bg-[#78b527]',
       glow: 'group-hover:shadow-accent-500/20',
     },
     {
       label: 'Avg. Score',
       value:
-        websites.length > 0
+        safeWebsites.length > 0
           ? Math.round(
               websites.reduce((acc, curr) => acc + (curr.aiReview?.score || 0), 0) /
-                websites.filter((w) => w.aiReview).length || 0
+                safeWebsites.filter((w: any) => w.aiReview).length || 0
             )
           : 0,
       icon: '📈',
-      gradient: 'from-blue-500 to-cyan-400',
+      color: 'bg-[#0a2615]',
       glow: 'group-hover:shadow-blue-500/20',
     },
   ];
@@ -83,14 +86,14 @@ export default function DashboardPage() {
       <nav className="border-b border-border bg-surface-0/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-brand-500 to-brand-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-[#c1f02a] flex items-center justify-center">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="3" />
                 <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
               </svg>
             </div>
             <span className="text-lg font-bold text-text-primary">
-              Design<span className="gradient-text">Lens</span>
+              Design<span className="text-[#c1f02a]">Lens</span>
             </span>
           </Link>
 
@@ -99,7 +102,7 @@ export default function DashboardPage() {
               Komunitas
             </Link>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-linear-to-br from-brand-500 to-brand-400 flex items-center justify-center text-white text-xs font-bold">
+              <div className="w-8 h-8 rounded-lg-sm bg-[#c1f02a] flex items-center justify-center text-white text-xs font-bold">
                 {user?.name?.charAt(0)?.toUpperCase()}
               </div>
               <span className="text-sm text-text-primary font-medium hidden sm:block">{user?.name}</span>
@@ -118,8 +121,8 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-brand-500/20 bg-brand-500/5 text-brand-400 text-xs font-medium mb-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent-400 animate-pulse" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 cyber-cut-sm border border-[#c1f02a]/20 bg-[#c1f02a]/5 text-[#78b527] text-xs font-medium mb-3">
+              <span className="w-1.5 h-1.5 cyber-cut-sm bg-accent-400 animate-pulse" />
               Selamat datang kembali, {user?.name?.split(' ')[0]}
             </div>
             <h1 className="text-3xl font-bold text-text-primary flex">
@@ -129,7 +132,7 @@ export default function DashboardPage() {
           </div>
           <Link
             href="/upload"
-            className="px-5 py-2.5 rounded-xl bg-linear-to-r from-brand-500 to-brand-400 text-white font-medium text-sm hover:shadow-lg hover:shadow-brand-500/25 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2"
+            className="px-5 py-2.5 cyber-cut bg-[#050505] text-[#c1f02a] border border-[#c1f02a]/50 font-medium text-sm hover:shadow-lg hover:shadow-[#c1f02a]/25 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 5v14M5 12h14" />
@@ -143,10 +146,10 @@ export default function DashboardPage() {
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className={`glass-card p-5 flex items-center gap-4 hover:border-brand-500/30 hover:-translate-y-1 transition-all duration-300 group ${stat.glow} hover:shadow-lg`}
+              className={`glass-card p-5 flex items-center gap-4 hover:border-[#c1f02a]/30 hover:-translate-y-1 transition-all duration-300 group ${stat.glow} hover:shadow-lg`}
             >
               <div
-                className={`w-12 h-12 rounded-xl bg-linear-to-br ${stat.gradient} flex items-center justify-center text-2xl shrink-0 group-hover:scale-105 transition-transform duration-300`}
+                className={`w-12 h-12 rounded-xl ${stat.color} flex items-center justify-center text-2xl shrink-0 group-hover:scale-105 transition-transform duration-300`}
               >
                 {stat.icon}
               </div>
@@ -169,38 +172,38 @@ export default function DashboardPage() {
         {/* Websites List */}
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-[#c1f02a] border-t-transparent cyber-cut-sm animate-spin" />
           </div>
-        ) : websites.length === 0 ? (
+        ) : safeWebsites.length === 0 ? (
           <div className="glass-card p-12 text-center relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-brand-500 via-purple-500 to-pink-500" />
-            <div className="w-20 h-20 mx-auto mb-5 rounded-3xl bg-linear-to-br from-brand-500/10 to-brand-400/10 border border-brand-500/20 flex items-center justify-center text-5xl">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-[#c1f02a]" />
+            <div className="w-20 h-20 mx-auto mb-5 rounded-3xl bg-[#c1f02a]/10 border border-[#c1f02a]/20 flex items-center justify-center text-5xl">
               🚀
             </div>
             <h2 className="text-xl font-bold text-text-primary mb-2">Belum ada website</h2>
             <p className="text-text-secondary mb-6">Upload website pertama Anda untuk mulai mendapatkan feedback</p>
             <Link
               href="/upload"
-              className="inline-block px-6 py-3 rounded-xl bg-linear-to-r from-brand-500 to-brand-400 text-white font-medium hover:shadow-lg hover:shadow-brand-500/25 transition-all duration-300 hover:-translate-y-0.5"
+              className="inline-block px-6 py-3 cyber-cut bg-[#050505] text-[#c1f02a] border border-[#c1f02a]/50 font-medium hover:shadow-lg hover:shadow-[#c1f02a]/25 transition-all duration-300 hover:-translate-y-0.5"
             >
               Upload Website
             </Link>
           </div>
         ) : (
           <div className="grid gap-4">
-            {websites.map((website) => (
+            {safeWebsites.map((website) => (
               <Link
                 key={website.id}
                 href={`/review/${website.id}`}
-                className="glass-card p-5 flex flex-col sm:flex-row sm:items-center gap-4 hover:border-brand-500/30 hover:-translate-y-0.5 transition-all duration-300 group"
+                className="glass-card p-5 flex flex-col sm:flex-row sm:items-center gap-4 hover:border-[#c1f02a]/30 hover:-translate-y-0.5 transition-all duration-300 group"
               >
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-text-primary group-hover:text-brand-400 transition-colors truncate">
+                  <h3 className="font-semibold text-text-primary group-hover:text-[#78b527] transition-colors truncate">
                     {website.title}
                   </h3>
                   <p className="text-sm text-text-tertiary truncate mt-0.5">{website.url}</p>
                   <div className="flex items-center gap-3 mt-2">
-                    <span className="px-2 py-0.5 rounded-md bg-brand-500/10 text-brand-400 text-xs font-medium">
+                    <span className="px-2 py-0.5 rounded-md bg-[#c1f02a]/10 text-[#78b527] text-xs font-medium">
                       {website.category?.name}
                     </span>
                     <span className="text-xs text-text-tertiary">
@@ -229,7 +232,7 @@ export default function DashboardPage() {
                       </span>
                     </div>
                   )}
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-text-tertiary group-hover:text-brand-400 transition-colors">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-text-tertiary group-hover:text-[#78b527] transition-colors">
                     <path d="M9 18l6-6-6-6" />
                   </svg>
                 </div>

@@ -9,21 +9,21 @@ import HowItWorks from '@/components/HowItWorks';
 import ScrollFloat from '@/components/ScrollFloat';
 // ─── Static Pin Data for Live Preview Section ─────────────────────────────────
 const PREVIEW_PINS = [
-  { id: 1, xPct: 10, yPct: 8, label: 'Navigation', score: 70, color: '#8A2BE2' },
-  { id: 2, xPct: 55, yPct: 28, label: 'Typography', score: 88, color: '#BFFF00' },
-  { id: 3, xPct: 52, yPct: 72, label: 'CTA', score: 45, color: '#8A2BE2' },
-  { id: 4, xPct: 88, yPct: 12, label: 'Color', score: 91, color: '#BFFF00' },
-  { id: 5, xPct: 18, yPct: 55, label: 'Accessibility', score: 78, color: '#8A2BE2' },
-  { id: 6, xPct: 85, yPct: 70, label: 'Layout', score: 83, color: '#BFFF00' },
+  { id: 1, xPct: 10, yPct: 8, label: 'Navigation', score: 70, color: '#8A2BE1' },
+  { id: 2, xPct: 55, yPct: 28, label: 'Typography', score: 88, color: '#8A2BE1' },
+  { id: 3, xPct: 52, yPct: 72, label: 'CTA', score: 45, color: '#8A2BE1' },
+  { id: 4, xPct: 88, yPct: 12, label: 'Color', score: 91, color: '#8A2BE1' },
+  { id: 5, xPct: 18, yPct: 55, label: 'Accessibility', score: 78, color: '#8A2BE1' },
+  { id: 6, xPct: 85, yPct: 70, label: 'Layout', score: 83, color: '#8A2BE1' },
 ];
 
 const SCORE_BAR_COLORS: Record<string, string> = {
-  layout: '#BFFF00',
-  typography: '#8A2BE2',
-  color: '#BFFF00',
-  navigation: '#8A2BE2',
-  cta: '#8A2BE2',
-  accessibility: '#BFFF00',
+  layout: '#8A2BE1',
+  typography: '#8A2BE1',
+  color: '#8A2BE1',
+  navigation: '#8A2BE1',
+  cta: '#8A2BE1',
+  accessibility: '#8A2BE1',
 };
 
 // ─── Score Ring SVG ────────────────────────────────────────────────────────────
@@ -50,6 +50,29 @@ export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [expandedCard, setExpandedCard] = useState<'ai' | 'community'>('ai');
   const [activePin, setActivePin] = useState<number | null>(null);
+  const [simulating, setSimulating] = useState(false);
+  const [scannedPins, setScannedPins] = useState<number[]>(PREVIEW_PINS.map(p => p.id));
+
+  const runSimulation = () => {
+    if (simulating) return;
+    setSimulating(true);
+    setScannedPins([]);
+    setActivePin(null);
+    let current = [] as number[];
+    PREVIEW_PINS.forEach((pin, index) => {
+      setTimeout(() => {
+        current = [...current, pin.id];
+        setScannedPins(current);
+        setActivePin(pin.id);
+        if (index === PREVIEW_PINS.length - 1) {
+          setTimeout(() => {
+            setSimulating(false);
+            setActivePin(null);
+          }, 1500);
+        }
+      }, (index * 800) + 500);
+    });
+  };
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -70,19 +93,17 @@ export default function LandingPage() {
           scrolled ? 'w-[95%] max-w-6xl' : 'w-[98%] max-w-7xl opacity-90'
         }`}
       >
-        <div className={`mx-auto px-6 py-3.5 rounded-2xl backdrop-blur-2xl border border-white/10 bg-[#0A0A0A]/60 shadow-2xl shadow-black/50 transition-all duration-500 ${scrolled ? 'bg-[#0A0A0A]/80 border-brand-500/20' : ''}`}>
+        <div className={`mx-auto px-6 py-3.5 rounded-2xl backdrop-blur-2xl border border-[#F9F9FD]/10 bg-[#0A0A0A]/60 shadow-2xl shadow-black/50 transition-all duration-500 ${scrolled ? 'bg-[#0A0A0A]/80 border-[#8A2BE1]/20' : ''}`}>
           <div className="flex items-center justify-between gap-6">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-              <div className="relative w-9 h-9 rounded-xl bg-linear-to-br from-brand-500 to-brand-400 flex items-center justify-center shadow-lg shadow-brand-500/30 group-hover:shadow-brand-500/50 transition-all duration-300 group-hover:scale-110">
+              <div className="relative w-9 h-9 rounded-xl bg-linear-to-br from-[#8A2BE1] to-purple-500 flex items-center justify-center shadow-lg shadow-[#8A2BE1]/30 group-hover:shadow-[#8A2BE1]/50 transition-all duration-300 group-hover:scale-110">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="3" />
                   <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
                 </svg>
               </div>
-              <span className="text-lg font-bold text-white hidden sm:block">
-                Design<span className="text-transparent bg-clip-text bg-linear-to-r from-brand-400 to-purple-400">Lens</span>
-              </span>
+              <span className="text-lg font-bold text-[#8A2BE1] hidden sm:block">DesignLens</span>
             </Link>
 
             {/* Desktop Nav */}
@@ -93,7 +114,7 @@ export default function LandingPage() {
                 { href: '#how-it-works', label: 'Cara Kerja' },
                 { href: '/community', label: 'Komunitas' },
               ].map((item) => (
-                <Link key={item.href} href={item.href} className="cursor-target px-4 py-2 rounded-xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 transition-all duration-300">
+                <Link key={item.href} href={item.href} className="cursor-target px-4 py-2 rounded-xl text-sm font-medium text-[#F9F9FD]/70 hover:text-[#F9F9FD] hover:bg-[#F9F9FD]/5 transition-all duration-300">
                   {item.label}
                 </Link>
               ))}
@@ -102,15 +123,15 @@ export default function LandingPage() {
             {/* Auth */}
             <div className="flex items-center gap-2 shrink-0">
               {isAuthenticated ? (
-                <Link href="/dashboard" className="cursor-target px-5 py-2.5 rounded-xl bg-linear-to-r from-brand-500 to-brand-400 text-white text-sm font-semibold hover:shadow-lg hover:shadow-brand-500/40 transition-all duration-300 hover:-translate-y-0.5">
+                <Link href="/dashboard" className="cursor-target px-5 py-2.5 cyber-cut bg-[#8A2BE1] text-[#F9F9FD] text-sm font-semibold hover:shadow-lg hover:shadow-[#8A2BE1]/40 transition-all duration-300 hover:-translate-y-0.5">
                   Dashboard
                 </Link>
               ) : (
                 <>
-                  <Link href="/login" className="cursor-target hidden sm:block px-4 py-2.5 rounded-xl text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 transition-all duration-300">
+                  <Link href="/login" className="cursor-target hidden sm:block px-4 py-2.5 cyber-cut text-sm font-medium text-[#F9F9FD]/80 hover:text-[#F9F9FD] hover:bg-[#F9F9FD]/5 transition-all duration-300">
                     Masuk
                   </Link>
-                  <Link href="/register" className="cursor-target px-5 py-2.5 rounded-xl bg-linear-to-r from-brand-500 to-brand-400 text-white text-sm font-semibold hover:shadow-lg hover:shadow-brand-500/40 transition-all duration-300 hover:-translate-y-0.5 border border-white/10">
+                  <Link href="/register" className="cursor-target px-5 py-2.5 cyber-cut bg-[#8A2BE1] text-[#F9F9FD] text-sm font-semibold hover:shadow-lg hover:shadow-[#8A2BE1]/40 transition-all duration-300 hover:-translate-y-0.5 border border-[#F9F9FD]/10">
                     Daftar Gratis
                   </Link>
                 </>
@@ -118,7 +139,7 @@ export default function LandingPage() {
               {/* Mobile hamburger */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="cursor-target md:hidden p-2 rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-all"
+                className="cursor-target md:hidden p-2 rounded-xl text-[#F9F9FD]/70 hover:text-[#F9F9FD] hover:bg-[#F9F9FD]/5 transition-all"
               >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   {mobileMenuOpen ? <path d="M18 6L6 18M6 6l12 12" /> : <path d="M3 12h18M3 6h18M3 18h18" />}
@@ -129,7 +150,7 @@ export default function LandingPage() {
         </div>
 
         {/* Mobile menu */}
-        <div className={`md:hidden mt-2 px-6 py-4 rounded-2xl backdrop-blur-2xl bg-[#0A0A0A]/90 border border-white/10 transition-all duration-300 ${mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
+        <div className={`md:hidden mt-2 px-6 py-4 rounded-2xl backdrop-blur-2xl bg-[#0A0A0A]/90 border border-[#F9F9FD]/10 transition-all duration-300 ${mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
           <div className="flex flex-col gap-2">
             {[
               { href: '#features', label: 'Fitur' },
@@ -140,7 +161,7 @@ export default function LandingPage() {
               { href: '/register', label: 'Daftar Gratis', primary: true },
             ].map((item) => (
               <Link key={item.href} href={item.href} onClick={() => setMobileMenuOpen(false)}
-                className={`px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${item.primary ? 'bg-linear-to-r from-brand-500 to-brand-400 text-white text-center' : 'text-white/70 hover:text-white hover:bg-white/5'}`}
+                className={`px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${item.primary ? 'bg-[#8A2BE1] text-[#F9F9FD] text-center' : 'text-[#F9F9FD]/70 hover:text-[#F9F9FD] hover:bg-[#F9F9FD]/5'}`}
               >
                 {item.label}
               </Link>
@@ -152,14 +173,14 @@ export default function LandingPage() {
       {/* ═══════════════════════════════ HERO ════════════════════════════════ */}
       <section className="relative pt-32 pb-104 md:pt-40 md:pb-128 px-6 overflow-hidden">
         <div className={`relative z-10 max-w-5xl mx-auto text-center transition-all duration-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-brand-500/20 bg-brand-500/5 text-brand-400 text-sm mb-6 backdrop-blur-sm">
-            <span className="w-2 h-2 rounded-full bg-accent-400 animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#8A2BE1]/20 bg-[#8A2BE1]/5 text-[#8A2BE1] text-sm mb-6 backdrop-blur-sm">
+            <span className="w-2 h-2 rounded-full bg-[#8A2BE1] animate-pulse" />
             Powered by AI + Community Review
           </div>
 
           <h1 className="text-4xl md:text-6xl font-bold leading-tight tracking-tight mb-5 flex flex-col items-center">
             <ScrollFloat textClassName="text-text-primary" stagger={0.02} animationDuration={1.2}>Evaluasi Desain</ScrollFloat>
-            <ScrollFloat textClassName="gradient-text" stagger={0.02} animationDuration={1.2}>Website Anda</ScrollFloat>
+            <ScrollFloat textClassName="text-[#8A2BE1]" stagger={0.02} animationDuration={1.2}>Website Anda</ScrollFloat>
             <ScrollFloat textClassName="text-text-primary" stagger={0.02} animationDuration={1.2}>dalam Hitungan Detik</ScrollFloat>
           </h1>
 
@@ -171,43 +192,21 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/register"
-              className="cursor-target group relative px-8 py-3.5 rounded-2xl bg-linear-to-r from-brand-500 to-brand-400 text-white font-semibold text-lg hover:shadow-2xl hover:shadow-brand-500/30 transition-all duration-500 hover:-translate-y-1"
+              className="cursor-target group relative px-8 py-3.5 cyber-cut bg-[#8A2BE1] text-[#F9F9FD] font-bold text-lg hover:shadow-2xl hover:shadow-[#8A2BE1]/30 transition-all duration-500 hover:-translate-y-1"
             >
               Mulai Evaluasi — Gratis
-              <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-brand-400 to-purple-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl" />
+              <div className="absolute inset-0 cyber-cut bg-[#8A2BE1] opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl" />
             </Link>
             <a
               href="#live-preview"
-              className="cursor-target px-8 py-3.5 rounded-2xl border border-border text-text-secondary font-medium hover:border-brand-500/50 hover:text-brand-400 transition-all duration-300 backdrop-blur-sm bg-white/5"
+              className="cursor-target px-8 py-3.5 cyber-cut border border-border text-text-secondary font-medium hover:border-[#8A2BE1]/50 hover:text-[#8A2BE1] transition-all duration-300 backdrop-blur-sm bg-[#F9F9FD]/5"
             >
-              Lihat Demo →
+              Lihat Demo &rarr;
             </a>
           </div>
         </div>
 
-        {/* Floating score badges */}
-        {[
-          { pos: 'top-[14%] left-[3%]', delay: 400, label: 'Color', val: 78, dot: 'bg-fuchsia-400' },
-          { pos: 'top-[30%] left-[6%]', delay: 500, label: 'Layout', val: 92, dot: 'bg-indigo-400' },
-          { pos: 'top-[55%] left-[10%]', delay: 700, label: 'Accessibility', val: 88, dot: 'bg-pink-400' },
-          { pos: 'top-[16%] right-[3%]', delay: 450, label: 'CTA', val: 71, dot: 'bg-yellow-400' },
-          { pos: 'top-[35%] right-[6%]', delay: 600, label: 'Typography', val: 85, dot: 'bg-teal-400' },
-          { pos: 'top-[60%] right-[10%]', delay: 800, label: 'Navigation', val: 88, dot: 'bg-purple-400' },
-        ].map((badge) => (
-          <div
-            key={badge.label}
-            className={`hidden lg:block absolute ${badge.pos} transition-all duration-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
-            style={{ transitionDelay: `${badge.delay}ms` }}
-          >
-            <div className="glass-card px-4 py-3 flex items-center gap-3 shadow-xl hover:-translate-y-1 transition-transform duration-300">
-              <span className={`w-2 h-2 rounded-full ${badge.dot}`} />
-              <div>
-                <div className="text-xs text-text-tertiary">{badge.label}</div>
-                <div className="text-lg font-bold text-text-primary">{badge.val}</div>
-              </div>
-            </div>
-          </div>
-        ))}
+
       </section>
 
       {/* ═══════════════════════════════ PLATFORM STATS ═══════════════════════ */}
@@ -219,7 +218,7 @@ export default function LandingPage() {
             <div className="text-center mb-12">
               <div className="section-divider" />
               <h2 className="text-2xl md:text-3xl font-bold text-text-primary">
-                Dipercaya oleh <span className="gradient-text">Developer & Desainer</span>
+                Dipercaya oleh <span className="text-[#8A2BE1]">Developer & Desainer</span>
               </h2>
             </div>
           </ScrollReveal>
@@ -252,7 +251,7 @@ export default function LandingPage() {
             <div className="text-center mb-16">
               <div className="section-divider" />
               <h2 className="text-3xl md:text-5xl font-bold text-text-primary mb-4">
-                Dua Pendekatan, <span className="gradient-text">Satu Tujuan</span>
+                Dua Pendekatan, <span className="text-[#8A2BE1]">Satu Tujuan</span>
               </h2>
               <p className="text-text-secondary text-lg max-w-2xl mx-auto">
                 Kombinasi kecerdasan AI dan wisdom of the crowd untuk evaluasi UI/UX yang komprehensif
@@ -343,11 +342,24 @@ export default function LandingPage() {
             <div className="text-center mb-14">
               <div className="section-divider" />
               <h2 className="text-3xl md:text-5xl font-bold text-text-primary mb-4">
-                Lihat AI Bekerja, <span className="gradient-text">Secara Nyata</span>
+                Lihat AI Bekerja
               </h2>
-              <p className="text-text-secondary text-lg max-w-2xl mx-auto">
-                Setiap elemen website Anda ditandai, dievaluasi, dan diberikan skor dengan penjelasan detail dari AI
+              <p className="text-text-secondary text-lg max-w-2xl mx-auto mb-8">
+                Klik tombol di bawah untuk melihat simulasi bagaimana AI kami menganalisis dan memberi skor pada website secara real-time.
               </p>
+              <button
+                onClick={runSimulation}
+                disabled={simulating}
+                className="inline-flex items-center gap-3 px-8 py-3.5 bg-white text-black font-semibold cyber-cut hover:bg-gray-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed mx-auto"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polygon points="5 3 19 12 5 21 5 3" />
+                </svg>
+                Jalankan Simulasi Scan
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="ml-1 opacity-50">
+                  <path d="M4 7V4h3M17 4h3v3M4 17v3h3M17 20h3v-3" />
+                </svg>
+              </button>
             </div>
           </ScrollReveal>
 
@@ -396,7 +408,7 @@ export default function LandingPage() {
                   </div>
 
                   {/* AI Pins */}
-                  {PREVIEW_PINS.map((pin) => (
+                  {PREVIEW_PINS.filter(p => scannedPins.includes(p.id)).map((pin) => (
                     <div
                       key={pin.id}
                       className="pin-wrapper absolute"
@@ -421,10 +433,18 @@ export default function LandingPage() {
                   ))}
 
                   {/* Overlay label */}
-                  <div className="absolute bottom-3 left-3 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/60 backdrop-blur-sm">
-                    <span className="w-2 h-2 rounded-full bg-accent-400 animate-pulse" />
-                    <span className="text-xs text-white/70">AI Analyzing…</span>
-                  </div>
+                  {simulating && (
+                    <div className="absolute bottom-3 left-3 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/60 backdrop-blur-sm animate-fade-in">
+                      <span className="w-2 h-2 rounded-full bg-[#8A2BE1] animate-pulse" />
+                      <span className="text-xs text-[#F9F9FD]/70">AI Analyzing…</span>
+                    </div>
+                  )}
+                  {!simulating && scannedPins.length === PREVIEW_PINS.length && (
+                    <div className="absolute bottom-3 left-3 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/60 backdrop-blur-sm animate-fade-in">
+                      <span className="w-2 h-2 rounded-full bg-green-500" />
+                      <span className="text-xs text-[#F9F9FD]/70">Scan Complete</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </ScrollReveal>
@@ -433,12 +453,12 @@ export default function LandingPage() {
             <ScrollReveal direction="right" delay={100}>
               <div className="space-y-4">
                 <div className="mb-6">
-                  <div className="text-xs font-mono text-brand-400 mb-2 tracking-wider">HASIL EVALUASI AI</div>
+                  <div className="text-xs font-mono text-[#8A2BE1] mb-2 tracking-wider">HASIL EVALUASI AI</div>
                   <h3 className="text-2xl font-bold text-text-primary mb-1">Laporan Detail Per Kategori</h3>
                   <p className="text-text-secondary text-sm">Hover pada pin di screenshot untuk melihat lokasi permasalahan</p>
                 </div>
 
-                {PREVIEW_PINS.map((pin) => (
+                {PREVIEW_PINS.filter(p => scannedPins.includes(p.id)).map((pin) => (
                   <div
                     key={pin.id}
                     className={`glass-card px-4 py-3 flex items-center gap-4 transition-all duration-300 ${activePin === pin.id ? 'border-opacity-60 scale-[1.02]' : ''}`}
@@ -453,7 +473,7 @@ export default function LandingPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-sm font-medium text-text-primary">{pin.label}</span>
-                        <span className="text-sm font-bold" style={{ color: pin.score >= 80 ? '#BFFF00' : pin.score >= 60 ? '#BFFF00' : '#8A2BE2' }}>
+                        <span className="text-sm font-bold" style={{ color: pin.score >= 80 ? '#8A2BE1' : pin.score >= 60 ? '#8A2BE1' : '#8A2BE1' }}>
                           {pin.score}/100
                         </span>
                       </div>
@@ -468,18 +488,20 @@ export default function LandingPage() {
                   </div>
                 ))}
 
-                <div className="glass-card px-5 py-4 border-brand-500/20 mt-2">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-xs text-text-tertiary mb-1">Overall Score</div>
-                      <div className="text-3xl font-bold gradient-text">79/100</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-xs text-text-tertiary mb-1">Status</div>
-                      <span className="px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-400 text-xs font-semibold">Cukup Baik</span>
+                {scannedPins.length === PREVIEW_PINS.length && (
+                  <div className="glass-card px-5 py-4 border-brand-500/20 mt-2 animate-fade-in">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-xs text-text-tertiary mb-1">Overall Score</div>
+                        <div className="text-3xl font-bold text-[#8A2BE1]">79/100</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xs text-text-tertiary mb-1">Status</div>
+                        <span className="px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-400 text-xs font-semibold">Cukup Baik</span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </ScrollReveal>
           </div>
@@ -496,7 +518,7 @@ export default function LandingPage() {
             <div className="text-center mb-14">
               <div className="section-divider" />
               <h2 className="text-3xl md:text-5xl font-bold text-text-primary mb-4">
-                6 Kategori Evaluasi <span className="gradient-text">UI/UX</span>
+                6 Kategori Evaluasi <span className="text-[#8A2BE1]">UI/UX</span>
               </h2>
               <p className="text-text-secondary text-lg max-w-2xl mx-auto">
                 AI kami menganalisis setiap aspek penting dari desain website Anda secara menyeluruh
@@ -538,10 +560,10 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto text-center">
           <ScrollReveal direction="up">
             <div className="glass-card p-12 md:p-16 relative overflow-hidden glow-brand">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-brand-500 via-purple-500 to-pink-500" />
+              <div className="absolute top-0 left-0 right-0 h-1 bg-[#8A2BE1]" />
               {/* BG decorative blobs */}
-              <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-brand-500/10 blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full bg-purple-500/10 blur-3xl pointer-events-none" />
+              <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-[#8A2BE1]/10 blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full bg-[#8A2BE1]/10 blur-3xl pointer-events-none" />
 
               <div className="relative z-10">
                 <div className="text-5xl mb-4">🚀</div>
@@ -554,15 +576,15 @@ export default function LandingPage() {
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link
                     href="/register"
-                    className="cursor-target inline-block px-8 py-4 rounded-2xl bg-linear-to-r from-brand-500 to-brand-400 text-white font-semibold text-lg hover:shadow-2xl hover:shadow-brand-500/30 transition-all duration-500 hover:-translate-y-1"
+                    className="cursor-target inline-block px-8 py-4 cyber-cut bg-[#8A2BE1] text-[#F9F9FD] font-bold text-lg hover:shadow-2xl hover:shadow-[#8A2BE1]/30 transition-all duration-500 hover:-translate-y-1"
                   >
                     Daftar Gratis Sekarang
                   </Link>
                   <Link
                     href="/community"
-                    className="cursor-target inline-block px-8 py-4 rounded-2xl border border-border text-text-secondary font-semibold text-lg hover:border-brand-500/50 hover:text-brand-400 transition-all duration-300 backdrop-blur-sm bg-white/5"
+                    className="cursor-target inline-block px-8 py-4 cyber-cut border border-border text-text-secondary font-semibold text-lg hover:border-[#8A2BE1]/50 hover:text-[#8A2BE1] transition-all duration-300 backdrop-blur-sm bg-white/5"
                   >
-                    Jelajahi Komunitas →
+                    Jelajahi Komunitas &rarr;
                   </Link>
                 </div>
               </div>
@@ -583,7 +605,7 @@ export default function LandingPage() {
                     <circle cx="12" cy="12" r="3" /><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
                   </svg>
                 </div>
-                <span className="font-bold text-white text-lg">Design<span className="gradient-text">Lens</span> AI</span>
+                <span className="font-bold text-white text-lg">Design<span className="text-[#8A2BE1]">Lens</span> AI</span>
               </Link>
               <p className="text-sm text-white/60 leading-relaxed max-w-xs">
                 Platform evaluasi UI/UX website berbasis AI dan Community Review. Dapatkan feedback desain yang akurat dan actionable.
@@ -651,3 +673,5 @@ export default function LandingPage() {
     </div>
   );
 }
+
+

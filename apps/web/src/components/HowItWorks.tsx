@@ -15,35 +15,35 @@ const STEPS = [
     title: 'Masukkan URL',
     description: 'Cukup tempelkan tautan website atau aplikasi web Anda. Tidak perlu instalasi khusus atau setup berbelit.',
     icon: '🔗',
-    color: 'from-brand-500 to-purple-600',
+    color: 'bg-[#8A2BE1]',
   },
   {
     id: 2,
     title: 'Evaluasi Instan oleh AI',
     description: 'AI kami akan menelusuri halaman Anda dan menganalisis 6 metrik utama UX/UI dalam hitungan detik.',
     icon: '🤖',
-    color: 'from-brand-400 to-brand-300',
+    color: 'bg-[#8A2BE1]',
   },
   {
     id: 3,
     title: 'Dapatkan Laporan Detail',
     description: 'Lihat skor komprehensif, temukan titik kelemahan (pain points), dan dapatkan saran perbaikan yang konkret.',
     icon: '📊',
-    color: 'from-pink-500 to-rose-500',
+    color: 'bg-[#8A2BE1]',
   },
   {
     id: 4,
     title: 'Review dari Komunitas (Opsional)',
     description: 'Bagikan hasil evaluasi ke komunitas kami untuk mendapatkan wawasan tambahan dari desainer dan developer lain.',
     icon: '👥',
-    color: 'from-amber-500 to-orange-500',
+    color: 'bg-[#8A2BE1]',
   },
   {
     id: 5,
     title: 'Terapkan & Tingkatkan',
     description: 'Terapkan rekomendasi yang diberikan, tingkatkan konversi dan kepuasan pengguna (user experience) Anda!',
     icon: '🚀',
-    color: 'from-blue-500 to-indigo-500',
+    color: 'bg-[#8A2BE1]',
   }
 ];
 
@@ -96,12 +96,12 @@ export default function HowItWorks() {
           {/* Header Card yang diam di awal */}
           <div className="w-75 md:w-100 shrink-0 mr-8 md:mr-16">
             <h2 className="text-4xl md:text-6xl font-bold mb-4 leading-tight">
-              Cara <span className="gradient-text">Kerja</span>
+              Cara <span className="text-[#8A2BE1]">Kerja</span>
             </h2>
             <p className="text-text-secondary text-lg">
               Perjalanan singkat untuk mengubah desain yang biasa saja menjadi luar biasa.
               <br/><br/>
-              <span className="text-brand-400 font-medium animate-pulse">Scroll ke bawah untuk melanjutkan &rarr;</span>
+              <span className="text-[#8A2BE1] font-medium animate-pulse">Scroll ke bawah untuk melanjutkan &rarr;</span>
             </p>
           </div>
 
@@ -112,10 +112,10 @@ export default function HowItWorks() {
               className="w-75 md:w-100 shrink-0 h-100 glass-card p-8 flex flex-col justify-between hover:border-white/20 transition-colors duration-300 relative group"
             >
               {/* Background gradient glow on hover */}
-              <div className={`absolute inset-0 bg-linear-to-br ${step.color} opacity-0 group-hover:opacity-5 transition-opacity duration-500 rounded-2xl -z-10`} />
+              <div className={`absolute inset-0 bg-linear-to-br ${step.color} opacity-0 group-hover:opacity-5 transition-opacity duration-500 cyber-cut -z-10`} />
               
               <div>
-                <div className={`w-16 h-16 rounded-2xl bg-linear-to-br ${step.color} flex items-center justify-center text-3xl mb-8 shadow-lg`}>
+                <div className={`w-16 h-16 cyber-cut bg-linear-to-br ${step.color} flex items-center justify-center text-3xl mb-8 shadow-lg`}>
                   {step.icon}
                 </div>
                 <h3 className="text-2xl font-bold mb-3">{step.title}</h3>

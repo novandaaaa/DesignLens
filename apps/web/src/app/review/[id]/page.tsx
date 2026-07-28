@@ -7,12 +7,12 @@ import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 
 const SCORE_COLORS: Record<string, string> = {
-  layout: 'from-green-400 to-emerald-500',
-  typography: 'from-blue-400 to-cyan-500',
-  color: 'from-purple-400 to-pink-500',
-  navigation: 'from-orange-400 to-red-500',
-  cta: 'from-yellow-400 to-orange-500',
-  accessibility: 'from-teal-400 to-green-500',
+  layout: 'bg-[#c1f02a]',
+  typography: 'bg-[#78b527]',
+  color: 'bg-[#0a2615]',
+  navigation: 'bg-[#c1f02a]',
+  cta: 'bg-[#78b527]',
+  accessibility: 'bg-[#0a2615]',
 };
 
 function ScoreRing({ score, size = 80 }: { score: number; size?: number }) {
@@ -105,7 +105,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   if (loading || authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#c1f02a] border-t-transparent cyber-cut-sm animate-spin" />
       </div>
     );
   }
@@ -147,11 +147,11 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-text-primary mb-1">{website.title}</h1>
-            <a href={website.url} target="_blank" rel="noopener noreferrer" className="text-brand-400 hover:underline text-sm">
+            <a href={website.url} target="_blank" rel="noopener noreferrer" className="text-[#78b527] hover:underline text-sm">
               {website.url} ↗
             </a>
             <div className="flex items-center gap-3 mt-3">
-              <span className="px-3 py-1 rounded-lg bg-brand-500/10 text-brand-400 text-xs font-medium">
+              <span className="px-3 py-1 rounded-lg bg-[#c1f02a]/10 text-[#78b527] text-xs font-medium">
                 {website.category?.name}
               </span>
               {website.description && (
@@ -165,7 +165,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               <button
                 onClick={handleTriggerAi}
                 disabled={triggeringAi}
-                className="px-4 py-2 rounded-xl bg-linear-to-r from-brand-500 to-brand-400 text-white text-sm font-medium hover:shadow-lg transition-all disabled:opacity-50"
+                className="px-4 py-2 cyber-cut bg-[#c1f02a] text-white text-sm font-medium hover:shadow-lg transition-all disabled:opacity-50"
               >
                 {triggeringAi
                   ? 'Processing...'
@@ -178,7 +178,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               <button
                 onClick={handlePublish}
                 disabled={publishing}
-                className="px-4 py-2 rounded-xl border border-accent-500 text-accent-500 text-sm font-medium hover:bg-accent-500/10 transition-all disabled:opacity-50"
+                className="px-4 py-2 cyber-cut border border-accent-500 text-accent-500 text-sm font-medium hover:bg-accent-500/10 transition-all disabled:opacity-50"
               >
                 {publishing ? 'Publishing...' : '👥 Publish ke Komunitas'}
               </button>
@@ -211,12 +211,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             {/* Score Grid */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {scores.map((item) => (
-                <div key={item.key} className="glass-card p-5 hover:border-brand-500/20 transition-all duration-300">
+                <div key={item.key} className="glass-card p-5 hover:border-[#c1f02a]/20 transition-all duration-300">
                   <div className="text-xs text-text-tertiary mb-2 uppercase tracking-wider">{item.label}</div>
                   <div className="text-3xl font-bold text-text-primary mb-3">{item.score ?? '-'}</div>
-                  <div className="w-full h-2 rounded-full bg-surface-200 overflow-hidden">
+                  <div className="w-full h-2 cyber-cut-sm bg-surface-200 overflow-hidden">
                     <div
-                      className={`h-full rounded-full bg-linear-to-r ${SCORE_COLORS[item.key]} transition-all duration-1000`}
+                      className={`h-full cyber-cut-sm ${SCORE_COLORS[item.key]} transition-all duration-1000`}
                       style={{ width: `${item.score ?? 0}%` }}
                     />
                   </div>
@@ -252,7 +252,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                           <ul className="space-y-1">
                             {data.recommendations.map((rec: string, i: number) => (
                               <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
-                                <span className="text-brand-400 mt-0.5">•</span>
+                                <span className="text-[#78b527] mt-0.5">•</span>
                                 {rec}
                               </li>
                             ))}
@@ -267,7 +267,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
             {/* Overall Recommendation */}
             {review.recommendation && (
-              <div className="glass-card p-5 border-brand-500/20">
+              <div className="glass-card p-5 border-[#c1f02a]/20">
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-lg">💡</span>
                   <h4 className="font-semibold text-text-primary">Rekomendasi Utama</h4>
@@ -281,10 +281,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         {/* Processing State */}
         {review && review.status === 'PROCESSING' && (
           <div className="glass-card p-12 text-center">
-            <div className="w-12 h-12 border-3 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <div className="w-12 h-12 border-3 border-[#c1f02a] border-t-transparent cyber-cut-sm animate-spin mx-auto mb-4" />
             <h2 className="text-xl font-bold text-text-primary mb-2">AI sedang menganalisis...</h2>
             <p className="text-text-secondary">Mohon tunggu beberapa saat. Halaman akan otomatis diperbarui.</p>
-            <button onClick={loadWebsite} className="mt-4 text-sm text-brand-400 hover:underline">
+            <button onClick={loadWebsite} className="mt-4 text-sm text-[#78b527] hover:underline">
               Refresh
             </button>
           </div>
@@ -296,7 +296,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             <div className="text-5xl mb-4">❌</div>
             <h2 className="text-xl font-bold text-red-400 mb-2">Proses AI Gagal</h2>
             <p className="text-text-secondary mb-6">Terjadi kesalahan saat memproses review (mungkin API key tidak valid atau website tidak dapat diakses).</p>
-            <button onClick={handleTriggerAi} disabled={triggeringAi} className="px-4 py-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 font-medium transition-all">
+            <button onClick={handleTriggerAi} disabled={triggeringAi} className="px-4 py-2 cyber-cut bg-red-500/10 text-red-400 hover:bg-red-500/20 font-medium transition-all">
               {triggeringAi ? 'Mencoba lagi...' : 'Coba Lagi'}
             </button>
           </div>
@@ -325,7 +325,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             </div>
             <Link
               href={`/community/${website.communityPost.id}`}
-              className="px-4 py-2 rounded-xl border border-border text-sm text-text-secondary hover:text-brand-400 hover:border-brand-500/30 transition-all"
+              className="px-4 py-2 cyber-cut border border-border text-sm text-text-secondary hover:text-[#78b527] hover:border-[#c1f02a]/30 transition-all"
             >
               Lihat Diskusi →
             </Link>
