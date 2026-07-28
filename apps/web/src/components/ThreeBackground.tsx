@@ -22,27 +22,23 @@ export default function ThreeBackground() {
     if (prefersReducedMotion) return;
 
     // ---------------------------------------
-    // SCENE
+    // SCENE & CAMERA
     // ---------------------------------------
     const scene = new THREE.Scene();
 
-    // ---------------------------------------
-    // CAMERA
-    // ---------------------------------------
     const camera = new THREE.PerspectiveCamera(
       45,
       container.clientWidth / container.clientHeight,
       0.1,
       1000
     );
-    if (isMobile) {
-  camera.position.set(0, 1, 18);
-} else {
-  camera.position.set(0, 0, 14);
-}
+    
+    // Posisi awal kamera
+    const initialCameraPos = isMobile ? new THREE.Vector3(0, 1, 18) : new THREE.Vector3(0, 0, 14);
+    camera.position.copy(initialCameraPos);
 
     // ---------------------------------------
-    // RENDERER (Dipindah ke atas sebelum environment)
+    // RENDERER
     // ---------------------------------------
     const renderer = new THREE.WebGLRenderer({
       antialias: !isMobile,
@@ -53,65 +49,63 @@ export default function ThreeBackground() {
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     
-    // Modern touch: Tone mapping
+    // Tone mapping disesuaikan agar warna hitam lebih pekat (tidak milky)
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
+    renderer.toneMappingExposure = 0.95; 
     
     container.appendChild(renderer.domElement);
 
     // ---------------------------------------
-    // ENVIRONMENT (Setelah renderer dibuat)
+    // ENVIRONMENT
     // ---------------------------------------
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
 
     // ---------------------------------------
-    // LIGHTS
+    // LIGHTS (Diton-down agar tidak terlalu terang)
     // ---------------------------------------
-    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    scene.add(new THREE.AmbientLight(0xffffff, 0.4));
 
-    const light1 = new THREE.PointLight(0x7c3aed, 200, 20);
+    const light1 = new THREE.PointLight(0x7c3aed, 150, 25);
     light1.position.set(6, 6, 8);
     scene.add(light1);
 
-    const light2 = new THREE.PointLight(0x3b82f6, 150, 20);
+    const light2 = new THREE.PointLight(0x3b82f6, 100, 25);
     light2.position.set(-8, -5, 5);
     scene.add(light2);
 
-    const frontLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    const frontLight = new THREE.DirectionalLight(0xffffff, 0.3);
     frontLight.position.set(0, 0, 5);
     scene.add(frontLight);
 
     // ---------------------------------------
-    // WEBSITE GROUP (Mockup Monitor Premium)
+    // WEBSITE GROUP (Mockup Monitor)
     // ---------------------------------------
     const website = new THREE.Group();
     scene.add(website);
 
     if (isMobile) {
-  website.scale.set(0.65, 0.65, 0.65);
-  website.position.y = 1.2;
-} else {
-  website.scale.set(1, 1, 1);
-}
+      website.scale.set(0.65, 0.65, 0.65);
+      website.position.y = 1.2;
+    }
 
-    // Material Kaca Modern (Glassmorphism)
+    // Material Kaca Modern (Glassmorphism) - Lebih transparan
     const glassMaterial = new THREE.MeshPhysicalMaterial({
       color: 0xffffff,
       metalness: 0.1,
-      roughness: 0.15,
-      transmission: 0.9,
+      roughness: 0.2,
+      transmission: 0.95,
       thickness: 0.5,
       transparent: true,
-      opacity: 0.8,
+      opacity: 0.4, // Dikurangi agar tidak menutupi konten
       side: THREE.DoubleSide,
     });
 
-    // Material Layar OLED Gelap
+    // Material Layar OLED Gelap (Matte, tidak memantulkan cahaya berlebihan)
     const screenBaseMaterial = new THREE.MeshStandardMaterial({
-      color: 0x050510,
-      roughness: 0.2,
-      metalness: 0.8,
+      color: 0x020205, // Lebih gelap
+      roughness: 0.8,  // Lebih matte (tidak mengkilap)
+      metalness: 0.2,
     });
 
     // Frame monitor
@@ -119,10 +113,10 @@ export default function ThreeBackground() {
       new THREE.BoxGeometry(8, 5, 0.25),
       new THREE.MeshPhysicalMaterial({
         color: 0x111827,
-        metalness: 0.9,
-        roughness: 0.2,
-        clearcoat: 1.0,
-        clearcoatRoughness: 0.1,
+        metalness: 0.8,
+        roughness: 0.3,
+        clearcoat: 0.8,
+        clearcoatRoughness: 0.2,
       })
     );
     website.add(frame);
@@ -143,27 +137,25 @@ export default function ThreeBackground() {
     header.position.set(0, 1.9, 0.14);
     website.add(header);
 
-    // Hero block
+    // Hero block (Dihapus emissive agar tidak glowing)
     const hero = new THREE.Mesh(
       new THREE.PlaneGeometry(6.2, 1),
       new THREE.MeshStandardMaterial({ 
         color: 0x4338ca,
-        emissive: 0x4338ca,
-        emissiveIntensity: 0.4,
-        roughness: 0.4
+        roughness: 0.6,
+        metalness: 0.1
       })
     );
     hero.position.set(0, 0.8, 0.14);
     website.add(hero);
 
-    // Tombol CTA
+    // Tombol CTA (Dihapus emissive agar tidak glowing)
     const button = new THREE.Mesh(
       new THREE.PlaneGeometry(2.2, 0.45),
       new THREE.MeshStandardMaterial({ 
         color: 0x8b5cf6,
-        emissive: 0x8b5cf6,
-        emissiveIntensity: 0.6,
-        roughness: 0.3
+        roughness: 0.4,
+        metalness: 0.2
       })
     );
     button.position.set(0, -0.2, 0.14);
@@ -181,10 +173,10 @@ export default function ThreeBackground() {
       card.position.set(0, cardStartY + i * -cardSpacing, 0.14);
       website.add(card);
       
-      // Garis aksen
+      // Garis aksen (dibuat lebih subtle)
       const accent = new THREE.Mesh(
         new THREE.PlaneGeometry(0.15, 0.25),
-        new THREE.MeshBasicMaterial({ color: 0x38bdf8 })
+        new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.6 })
       );
       accent.position.set(-2.8, cardStartY + i * -cardSpacing, 0.15);
       website.add(accent);
@@ -193,58 +185,31 @@ export default function ThreeBackground() {
     // Logo dot
     const logo = new THREE.Mesh(
       new THREE.CircleGeometry(0.12, 32),
-      new THREE.MeshBasicMaterial({ color: 0xffffff })
+      new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.8 })
     );
     logo.position.set(-3.3, 1.9, 0.15);
     website.add(logo);
 
-    // AI scan line
+    // Scan line (Dibuat sangat subtle agar tidak mengganggu baca)
     const scanLine = new THREE.Mesh(
-      new THREE.PlaneGeometry(7.2, 0.06),
+      new THREE.PlaneGeometry(7.2, 0.04),
       new THREE.MeshBasicMaterial({
         color: 0x38bdf8,
         transparent: true,
-        opacity: 0.9,
+        opacity: 0.15, // Sangat rendah
         blending: THREE.AdditiveBlending,
       })
     );
     scanLine.position.z = 0.16;
     website.add(scanLine);
-    
-    // Scan line trail
-    const scanTrail = new THREE.Mesh(
-      new THREE.PlaneGeometry(7.2, 0.4),
-      new THREE.MeshBasicMaterial({
-        color: 0x38bdf8,
-        transparent: true,
-        opacity: 0.1,
-        blending: THREE.AdditiveBlending,
-      })
-    );
-    scanTrail.position.z = 0.15;
-    website.add(scanTrail);
-
-    // Glow di belakang layar
-    const glow = new THREE.Mesh(
-      new THREE.PlaneGeometry(9, 6),
-      new THREE.MeshBasicMaterial({
-        color: 0x7c3aed,
-        transparent: true,
-        opacity: 0.15,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-      })
-    );
-    glow.position.z = -0.5;
-    website.add(glow);
 
     // Stand monitor
     const stand = new THREE.Mesh(
       new THREE.BoxGeometry(0.25, 1.2, 0.2),
       new THREE.MeshPhysicalMaterial({
         color: 0x2d3748,
-        metalness: 0.9,
-        roughness: 0.3,
+        metalness: 0.8,
+        roughness: 0.4,
       })
     );
     stand.position.y = -3.1;
@@ -255,15 +220,15 @@ export default function ThreeBackground() {
       new THREE.CylinderGeometry(1.0, 1.2, 0.12, 64),
       new THREE.MeshPhysicalMaterial({
         color: 0x374151,
-        metalness: 0.9,
-        roughness: 0.3,
+        metalness: 0.8,
+        roughness: 0.4,
       })
     );
     base.position.y = -3.75;
     website.add(base);
 
     // ---------------------------------------
-    // FLOATING PARTICLES
+    // FLOATING PARTICLES (Dengan drift horizontal)
     // ---------------------------------------
     const particles = new THREE.Group();
     scene.add(particles);
@@ -271,7 +236,7 @@ export default function ThreeBackground() {
     const particleMaterial = new THREE.MeshBasicMaterial({
       color: 0x38bdf8,
       transparent: true,
-      opacity: 0.6,
+      opacity: 0.4,
       blending: THREE.AdditiveBlending,
     });
 
@@ -290,7 +255,8 @@ export default function ThreeBackground() {
         (Math.random() - 0.5) * 10
       );
 
-      particle.userData.speed = 0.003 + Math.random() * 0.005;
+      particle.userData.speedY = 0.002 + Math.random() * 0.004;
+      particle.userData.speedX = (Math.random() - 0.5) * 0.002; // Drift horizontal
       particle.userData.offset = Math.random() * Math.PI * 2;
       particle.userData.twinkleSpeed = 1 + Math.random() * 2;
 
@@ -299,14 +265,14 @@ export default function ThreeBackground() {
     }
 
     // ---------------------------------------
-    // GLOW RING
+    // GLOW RING (Dibuat lebih subtle)
     // ---------------------------------------
     const ring = new THREE.Mesh(
       new THREE.TorusGeometry(6, 0.02, 16, 100),
       new THREE.MeshBasicMaterial({
         color: 0x8b5cf6,
         transparent: true,
-        opacity: 0.2,
+        opacity: 0.1, // Dikurangi
         blending: THREE.AdditiveBlending,
       })
     );
@@ -341,11 +307,11 @@ export default function ThreeBackground() {
 
       const material = new THREE.MeshStandardMaterial({
         color: flyingPalette[i % flyingPalette.length],
-        emissive: flyingPalette[i % flyingPalette.length],
-        emissiveIntensity: 0.8,
+        roughness: 0.4,
+        metalness: 0.6,
         wireframe: true,
         transparent: true,
-        opacity: 0.7,
+        opacity: 0.5, // Dikurangi agar tidak terlalu ramai
       });
 
       const mesh = new THREE.Mesh(geometry, material);
@@ -364,14 +330,13 @@ export default function ThreeBackground() {
     });
 
     // ---------------------------------------
-    // MOUSE PARALLAX
+    // MOUSE PARALLAX & STATE
     // ---------------------------------------
     let mouseX = 0;
     let mouseY = 0;
-    let targetRotationX = 0;
-    let targetRotationY = 0;
 
     const handleMouseMove = (e: MouseEvent) => {
+      // Normalisasi nilai antara -1 dan 1
       mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
       mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
     };
@@ -394,10 +359,6 @@ export default function ThreeBackground() {
     let isPaused = false;
     const handleVisibilityChange = () => {
       isPaused = document.hidden;
-      if (!isPaused) {
-        clock.getDelta();
-        frameId = requestAnimationFrame(animate);
-      }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
@@ -408,59 +369,75 @@ export default function ThreeBackground() {
     let frameId: number;
 
     const animate = () => {
-      if (isPaused) return;
+      if (isPaused) {
+        frameId = requestAnimationFrame(animate);
+        return;
+      }
       frameId = requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
 
-      // Monitor melayang + smooth lerp
-      website.position.y = Math.sin(t * 1.0) * 0.2;
+      // 1. Animasi Mengambang yang Lebih Organik (Kombinasi Sin & Cos)
+      const floatY = Math.sin(t * 0.8) * 0.15 + Math.cos(t * 1.2) * 0.05;
+      website.position.y = (isMobile ? 1.2 : 0) + floatY;
       
-      // targetRotationY = mouseX * 0.3;
-      // targetRotationX = -mouseY * 0.2;
+      // 2. Smooth Parallax menggunakan Lerp (Linear Interpolation)
+      const targetRotationY = mouseX * 0.25; // Dikurangi sedikit agar tidak terlalu ekstrem
+      const targetRotationX = -mouseY * 0.15;
       
-      // website.rotation.y += (targetRotationY - website.rotation.y) * 0.05;
-      // website.rotation.x += (targetRotationX - website.rotation.x) * 0.05;
-      website.rotation.z = Math.sin(t * 0.8) * 0.015;
+      website.rotation.y = THREE.MathUtils.lerp(website.rotation.y, targetRotationY, 0.03);
+      website.rotation.x = THREE.MathUtils.lerp(website.rotation.x, targetRotationX, 0.03);
+      website.rotation.z = THREE.MathUtils.lerp(website.rotation.z, Math.sin(t * 0.5) * 0.01, 0.05);
 
-      // Glow berdenyut
-      (glow.material as THREE.MeshBasicMaterial).opacity = 0.12 + Math.sin(t * 1.5) * 0.05;
+      // 3. Camera Parallax (Memberikan efek kedalaman yang premium)
+      const targetCamX = mouseX * 0.3;
+      const targetCamY = -mouseY * 0.3 + (isMobile ? 1 : 0);
+      camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetCamX, 0.02);
+      camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetCamY, 0.02);
+      camera.lookAt(0, 0, 0);
 
-      // Scan line
-      const scanY = 2.2 - ((t * 1.2) % 4.4);
+      // 4. Scan line yang sangat subtle
+      const scanY = 2.2 - ((t * 0.8) % 4.4); // Gerakan lebih lambat
       scanLine.position.y = scanY;
-      scanTrail.position.y = scanY + 0.15;
       
-      const opacity = scanY < -1.5 ? Math.max(0, (scanY + 2.2) / 0.7) : 0.9;
+      // Fade in/out di ujung layar
+      const opacity = scanY < -1.5 ? Math.max(0, (scanY + 2.2) / 0.7) : 0.15;
       (scanLine.material as THREE.MeshBasicMaterial).opacity = opacity;
-      (scanTrail.material as THREE.MeshBasicMaterial).opacity = opacity * 0.2;
 
-      // Ring
-      ring.rotation.z += 0.002;
-      ring.rotation.x = (Math.PI / 2) + Math.sin(t * 0.5) * 0.1;
+      // 5. Ring rotation
+      ring.rotation.z += 0.001;
+      ring.rotation.x = (Math.PI / 2) + Math.sin(t * 0.3) * 0.05;
 
-      // Flying objects
+      // 6. Flying objects dengan gerakan yang lebih smooth
       flyingMeshes.forEach((mesh) => {
         mesh.position.y =
           mesh.userData.basePosition.y +
           Math.sin(t * mesh.userData.floatSpeed + mesh.userData.floatOffset) *
             mesh.userData.floatAmplitude;
         
-        mesh.position.x = mesh.userData.basePosition.x + mouseX * 0.5;
-        mesh.position.z = mesh.userData.basePosition.z + mouseY * 0.3;
+        // Parallax ringan pada objek terbang
+        mesh.position.x = mesh.userData.basePosition.x + mouseX * 0.3;
+        mesh.position.z = mesh.userData.basePosition.z + mouseY * 0.2;
 
-        mesh.rotation.x += mesh.userData.spinSpeed * 0.01;
-        mesh.rotation.y += mesh.userData.spinSpeed * 0.015;
+        mesh.rotation.x += mesh.userData.spinSpeed * 0.005;
+        mesh.rotation.y += mesh.userData.spinSpeed * 0.008;
       });
 
-      // Particles
+      // 7. Particles dengan drift horizontal
       particleList.forEach((p) => {
-        p.position.y += p.userData.speed;
+        p.position.y += p.userData.speedY;
+        p.position.x += p.userData.speedX; // Menambahkan gerakan menyamping
+        
+        // Reset posisi jika keluar batas
         if (p.position.y > 7) {
           p.position.y = -7;
           p.position.x = (Math.random() - 0.5) * 20;
         }
+        if (Math.abs(p.position.x) > 12) {
+          p.position.x = (Math.random() - 0.5) * 20;
+        }
+
         (p.material as THREE.MeshBasicMaterial).opacity = 
-          0.3 + Math.sin(t * p.userData.twinkleSpeed + p.userData.offset) * 0.3;
+          0.2 + Math.sin(t * p.userData.twinkleSpeed + p.userData.offset) * 0.2;
       });
 
       renderer.render(scene, camera);
@@ -490,7 +467,7 @@ export default function ThreeBackground() {
 
       pmremGenerator.dispose();
       renderer.dispose();
-      if (container.contains(renderer.domElement)) {
+      if (container && container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
       }
     };
