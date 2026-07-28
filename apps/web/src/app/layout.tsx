@@ -42,7 +42,7 @@ export default function RootLayout({
           <AuthProvider>
             <div className="fixed inset-0 -z-50 pointer-events-none">
               <Dither
-                waveColor={[0.6, 0.3, 0.9]}
+                waveColor={[0.239, 0.239, 0.239]}
                 disableAnimation={false}
                 enableMouseInteraction={true}
                 mouseRadius={0.5}

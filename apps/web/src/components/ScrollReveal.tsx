@@ -10,6 +10,12 @@ interface ScrollRevealProps {
   threshold?: number;
 }
 
+const translateMap = {
+  up: 'translateY(40px)',
+  left: 'translateX(-40px)',
+  right: 'translateX(40px)',
+};
+
 export default function ScrollReveal({
   children,
   delay = 0,
@@ -18,12 +24,6 @@ export default function ScrollReveal({
   threshold = 0.15,
 }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
-
-  const translateMap = {
-    up: 'translateY(40px)',
-    left: 'translateX(-40px)',
-    right: 'translateX(40px)',
-  };
 
   useEffect(() => {
     const el = ref.current;

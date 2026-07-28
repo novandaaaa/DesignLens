@@ -73,7 +73,7 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#c1f02a] border-t-transparent cyber-cut-sm animate-spin" />
       </div>
     );
   }
@@ -97,7 +97,7 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
         {/* Post Header */}
         <div className="glass-card p-6 mb-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-linear-to-br from-brand-500 to-brand-400 flex items-center justify-center text-white text-sm font-bold">
+            <div className="w-10 h-10 cyber-cut-sm bg-[#c1f02a] flex items-center justify-center text-white text-sm font-bold">
               {post.website?.user?.name?.charAt(0)?.toUpperCase()}
             </div>
             <div>
@@ -111,14 +111,14 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
           </div>
 
           <h1 className="text-2xl font-bold text-text-primary mb-2">{post.website?.title}</h1>
-          <a href={post.website?.url} target="_blank" rel="noopener noreferrer" className="text-brand-400 hover:underline text-sm">
+          <a href={post.website?.url} target="_blank" rel="noopener noreferrer" className="text-[#78b527] hover:underline text-sm">
             {post.website?.url} ↗
           </a>
           {post.website?.description && (
             <p className="text-text-secondary mt-3 leading-relaxed">{post.website.description}</p>
           )}
           <div className="flex gap-3 mt-4">
-            <span className="px-3 py-1 rounded-lg bg-brand-500/10 text-brand-400 text-xs font-medium">
+            <span className="px-3 py-1 rounded-lg bg-[#c1f02a]/10 text-[#78b527] text-xs font-medium">
               {post.website?.category?.name}
             </span>
             <span className="text-sm text-text-tertiary">💬 {post._count?.comments ?? 0} komentar</span>
@@ -133,22 +133,22 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
               onChange={(e) => setComment(e.target.value)}
               placeholder="Tulis komentar atau feedback Anda..."
               rows={3}
-              className="w-full px-4 py-3 rounded-xl bg-surface-100 border placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all resize-none"
+              className="w-full px-4 py-3 cyber-cut bg-surface-100 border placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[#c1f02a]/50 focus:border-[#c1f02a] transition-all resize-none"
             />
             <div className="flex justify-end mt-2">
               <button
                 type="submit"
                 disabled={submitting || !comment.trim()}
-                className="px-5 py-2 rounded-xl bg-linear-to-r from-brand-500 to-brand-400 text-white text-sm font-medium hover:shadow-lg transition-all disabled:opacity-50"
+                className="px-5 py-2 cyber-cut bg-[#c1f02a] text-white text-sm font-medium hover:shadow-lg transition-all disabled:opacity-50"
               >
                 {submitting ? 'Mengirim...' : 'Kirim Komentar'}
               </button>
             </div>
           </form>
         ) : (
-          <div className="mb-8 p-4 rounded-xl bg-surface-100 border border-border text-center">
+          <div className="mb-8 p-4 cyber-cut bg-surface-100 border border-border text-center">
             <p className="text-text-secondary text-sm">
-              <Link href="/login" className="text-brand-400 hover:underline">Masuk</Link> untuk memberikan komentar
+              <Link href="/login" className="text-[#78b527] hover:underline">Masuk</Link> untuk memberikan komentar
             </p>
           </div>
         )}
@@ -163,7 +163,7 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
             post.comments.map((cmt: any) => (
               <div key={cmt.id} className="glass-card p-5">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-7 h-7 rounded-full bg-surface-200 flex items-center justify-center text-xs font-bold text-text-secondary">
+                  <div className="w-7 h-7 cyber-cut-sm bg-surface-200 flex items-center justify-center text-xs font-bold text-text-secondary">
                     {cmt.user?.name?.charAt(0)?.toUpperCase()}
                   </div>
                   <span className="text-sm font-medium text-text-primary">{cmt.user?.name}</span>
@@ -178,13 +178,13 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
                     <>
                       <button
                         onClick={() => handleLike(cmt.id)}
-                        className="text-xs text-text-tertiary hover:text-brand-400 transition-colors flex items-center gap-1"
+                        className="text-xs text-text-tertiary hover:text-[#78b527] transition-colors flex items-center gap-1"
                       >
                         ❤️ {cmt._count?.likes ?? 0}
                       </button>
                       <button
                         onClick={() => setReplyingTo(replyingTo === cmt.id ? null : cmt.id)}
-                        className="text-xs text-text-tertiary hover:text-brand-400 transition-colors"
+                        className="text-xs text-text-tertiary hover:text-[#78b527] transition-colors"
                       >
                         Balas
                       </button>
@@ -199,12 +199,12 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
                       value={replyText}
                       onChange={(e) => setReplyText(e.target.value)}
                       placeholder="Tulis balasan..."
-                      className="flex-1 px-3 py-2 rounded-lg bg-surface-100 border border-border text-sm placeholder:text-text-tertiary focus:outline-none focus:ring-1 focus:ring-brand-500/50"
+                      className="flex-1 px-3 py-2 rounded-lg bg-surface-100 border border-border text-sm placeholder:text-text-tertiary focus:outline-none focus:ring-1 focus:ring-[#c1f02a]/50"
                     />
                     <button
                       onClick={() => handleReply(cmt.id)}
                       disabled={submitting}
-                      className="px-4 py-2 rounded-lg bg-brand-500 text-white text-xs font-medium"
+                      className="px-4 py-2 rounded-lg bg-[#c1f02a] text-white text-xs font-medium"
                     >
                       Balas
                     </button>
@@ -217,7 +217,7 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
                     {cmt.replies.map((reply: any) => (
                       <div key={reply.id}>
                         <div className="flex items-center gap-2 mb-1">
-                          <div className="w-5 h-5 rounded-full bg-surface-200 flex items-center justify-center text-[10px] font-bold text-text-secondary">
+                          <div className="w-5 h-5 cyber-cut-sm bg-surface-200 flex items-center justify-center text-[10px] font-bold text-text-secondary">
                             {reply.user?.name?.charAt(0)?.toUpperCase()}
                           </div>
                           <span className="text-xs font-medium text-text-primary">{reply.user?.name}</span>

@@ -99,7 +99,7 @@ export default function UploadPage() {
         <p className="text-text-secondary mb-8">Masukkan informasi website yang ingin Anda evaluasi</p>
 
         {error && (
-          <div className="mb-6 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+          <div className="mb-6 p-3 cyber-cut bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
             {error}
           </div>
         )}
@@ -115,7 +115,7 @@ export default function UploadPage() {
               type="url"
               value={form.url}
               onChange={(e) => setForm({ ...form, url: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl bg-surface-100 border focus:border-brand-500 placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all"
+              className="w-full px-4 py-3 cyber-cut bg-surface-100 border focus:border-[#c1f02a] placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[#c1f02a]/50 transition-all"
               placeholder="https://example.com"
             />
           </div>
@@ -135,7 +135,7 @@ export default function UploadPage() {
                   setFiles(Array.from(e.target.files));
                 }
               }}
-              className="w-full px-4 py-3 rounded-xl bg-surface-100 border text-sm text-text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-brand-500/10 file:text-brand-400 hover:file:bg-brand-500/20 focus:outline-none focus:border-brand-500 transition-all"
+              className="w-full px-4 py-3 cyber-cut bg-surface-100 border text-sm text-text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#c1f02a]/10 file:text-[#78b527] hover:file:bg-[#c1f02a]/20 focus:outline-none focus:border-[#c1f02a] transition-all"
             />
             {files.length > 0 && (
               <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
@@ -163,7 +163,7 @@ export default function UploadPage() {
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               required
-              className="w-full px-4 py-3 rounded-xl bg-surface-100 border focus::border-brand:500 placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all"
+              className="w-full px-4 py-3 cyber-cut bg-surface-100 border focus::border-brand:500 placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[#c1f02a]/50 focus:border-[#c1f02a] transition-all"
               placeholder="Nama website Anda"
             />
           </div>
@@ -178,7 +178,7 @@ export default function UploadPage() {
               value={form.categoryId}
               onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
               required
-              className="w-full px-4 py-3 rounded-xl bg-surface-100 border text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all"
+              className="w-full px-4 py-3 cyber-cut bg-surface-100 border text-text-primary focus:outline-none focus:ring-2 focus:ring-[#c1f02a]/50 focus:border-[#c1f02a] transition-all"
             >
               <option value="">Pilih kategori</option>
               {categories.map((cat) => (
@@ -197,7 +197,7 @@ export default function UploadPage() {
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={3}
-              className="w-full px-4 py-3 rounded-xl bg-surface-100 border placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all resize-none"
+              className="w-full px-4 py-3 cyber-cut bg-surface-100 border placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[#c1f02a]/50 focus:border-[#c1f02a] transition-all resize-none"
               placeholder="Jelaskan website Anda secara singkat"
             />
           </div>
@@ -212,7 +212,7 @@ export default function UploadPage() {
               type="text"
               value={form.targetAudience}
               onChange={(e) => setForm({ ...form, targetAudience: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl bg-surface-100 border placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all"
+              className="w-full px-4 py-3 cyber-cut bg-surface-100 border placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[#c1f02a]/50 focus:border-[#c1f02a] transition-all"
               placeholder="Contoh: Mahasiswa, UMKM, Developer"
             />
           </div>
@@ -232,10 +232,10 @@ export default function UploadPage() {
                   key={option.value}
                   type="button"
                   onClick={() => setForm({ ...form, reviewType: option.value as any })}
-                  className={`p-4 rounded-xl border text-left transition-all duration-300 ${
+                  className={`p-4 cyber-cut border text-left transition-all duration-300 ${
                     form.reviewType === option.value
-                      ? 'border-brand-500 bg-brand-500/10 shadow-lg shadow-brand-500/10'
-                      : 'border-border bg-surface-100 hover:border-brand-500/30'
+                      ? 'border-[#c1f02a] bg-[#c1f02a]/10 shadow-lg shadow-[#c1f02a]/10'
+                      : 'border-border bg-surface-100 hover:border-[#c1f02a]/30'
                   }`}
                 >
                   <div className="text-lg mb-1">{option.label}</div>
@@ -249,7 +249,7 @@ export default function UploadPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-xl bg-linear-to-r from-brand-500 to-brand-400 text-white font-semibold text-lg hover:shadow-lg hover:shadow-brand-500/25 transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3.5 cyber-cut bg-[#c1f02a] text-white font-semibold text-lg hover:shadow-lg hover:shadow-[#c1f02a]/25 transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Memproses...' : 'Upload & Mulai Review'}
           </button>

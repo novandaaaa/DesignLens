@@ -48,14 +48,14 @@ export default function ThreeBackground() {
     // ---------------------------------------
     // LIGHTS
     // ---------------------------------------
-    scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+    scene.add(new THREE.AmbientLight(0xf9f9fd, 0.4));
 
-    const light1 = new THREE.PointLight(0x8b5cf6, 80, 15);
+    const light1 = new THREE.PointLight(0x8a2be1, 80, 15);
     light1.position.set(5, 5, 5);
     scene.add(light1);
 
-    const light2 = new THREE.PointLight(0x06b6d4, 60, 15);
-    light2.position.set(-5, -5, 5);
+    const light2 = new THREE.PointLight(0x1f1e2e, 60, 15);
+    light2.position.set(-5, -5, -5);
     scene.add(light2);
 
     // ---------------------------------------
@@ -78,7 +78,7 @@ export default function ThreeBackground() {
       // Node sphere
       const nodeGeometry = new THREE.SphereGeometry(0.08, 8, 8);
       const nodeMaterial = new THREE.MeshBasicMaterial({
-        color: 0x38bdf8,
+        color: 0xf9f9fd,
         transparent: true,
         opacity: 0.8,
       });
@@ -109,7 +109,7 @@ export default function ThreeBackground() {
           // Gradient color based on distance
           const distance = node.distanceTo(otherNode);
           const opacity = 1 - distance / connectionDistance;
-          lineColors.push(0.54, 0.36, 0.96, opacity); // Purple
+          lineColors.push(0.87, 0.84, 0.18, opacity); // Golden Yellow
           lineColors.push(0.22, 0.71, 0.85, opacity); // Cyan
         }
       });
@@ -133,7 +133,7 @@ export default function ThreeBackground() {
     // ---------------------------------------
     const accentCount = isMobile ? 3 : 6;
     const accents: THREE.Mesh[] = [];
-    const accentColors = [0x8b5cf6, 0x06b6d4, 0xec4899, 0xfbbf24];
+    const accentColors = [0x8a2be1, 0x1f1e2e, 0xf9f9fd, 0x8a2be1];
 
     for (let i = 0; i < accentCount; i++) {
       // Variasi bentuk geometri
