@@ -230,7 +230,7 @@ export default function ThreeBackground() {
       new THREE.MeshBasicMaterial({
         color: 0x7c3aed,
         transparent: true,
-        opacity: 0.05,
+        opacity: 0.03,
         blending: THREE.AdditiveBlending,
         depthWrite: false,
       })
@@ -423,7 +423,7 @@ export default function ThreeBackground() {
       website.rotation.z = Math.sin(t * 0.8) * 0.015;
 
       // Glow berdenyut
-      (glow.material as THREE.MeshBasicMaterial).opacity = 0.12 + Math.sin(t * 1.5) * 0.05;
+      (glow.material as THREE.MeshBasicMaterial).opacity = 0.02 + Math.sin(t * 1.5) * 0.01;
 
       // Scan line
       const scanY = 2.2 - ((t * 1.2) % 4.4);
