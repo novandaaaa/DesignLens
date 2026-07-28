@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import ThreeBackground from '@/components/ThreeBackground';
-import HyperspeedBackground from '@/components/HyperspeedBackground';
+//import HyperspeedBackground from '@/components/HyperspeedBackground';
 
 // NOTE: Pastikan path import di bawah ini sesuai dengan struktur folder proyek Anda.
 // Saya menambahkan placeholder agar kode tidak error saat dicoba.
@@ -52,7 +52,7 @@ export default function LandingPage() {
   return (
     <div className="relative min-h-screen overflow-hidden">
       {/* Lapisan background */}
-      <HyperspeedBackground />
+      {/* <HyperspeedBackground /> */}
       <ThreeBackground />
       <div className="fixed inset-0 -z-10 bg-gradient-to-b from-[#0F172A]/40 via-transparent to-[#0F172A]/60" />
 

@@ -22,7 +22,7 @@ export default function DashboardPage() {
   const loadWebsites = useCallback(async () => {
     try {
       const data = await api.getMyWebsites();
-      setWebsites(data.data);
+      setWebsites(data);
     } catch (error) {
       console.error('Failed to load websites:', error);
     } finally {
