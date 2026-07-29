@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import ScrollReveal from '@/components/ScrollReveal';
@@ -80,7 +81,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative min-h-screen">
       {/* Background layers */}
       <div className="fixed inset-0 -z-10 bg-linear-to-b from-[#0A0A0A]/40 via-transparent to-[#0A0A0A]/60" />
 
@@ -94,18 +95,13 @@ export default function LandingPage() {
           <div className="flex items-center justify-between gap-6">
             {/* Logo */}
             <Link href="/" className="cursor-target flex items-center gap-3 group shrink-0">
-              <div 
-                className="h-11 w-11 bg-[#8A2BE1] transition-transform duration-300 group-hover:scale-105 shrink-0"
-                style={{
-                  WebkitMaskImage: "url('/logo_DesignLens.png')",
-                  WebkitMaskSize: "contain",
-                  WebkitMaskRepeat: "no-repeat",
-                  WebkitMaskPosition: "center",
-                  maskImage: "url('/logo_DesignLens.png')",
-                  maskSize: "contain",
-                  maskRepeat: "no-repeat",
-                  maskPosition: "center",
-                }}
+              <Image 
+                src="/logo_DesignLens.png" 
+                alt="DesignLens Logo"
+                width={40}
+                height={40}
+                className="object-contain transition-transform duration-300 group-hover:scale-110 shrink-0 mix-blend-screen"
+                priority
               />
               <span className="text-2xl font-bold text-[#8A2BE1] hidden sm:block">DesignLens</span>
             </Link>

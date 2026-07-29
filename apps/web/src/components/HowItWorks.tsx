@@ -60,9 +60,10 @@ export default function HowItWorks() {
         scrollTrigger: {
           trigger: containerRef.current,
           pin: true,
-          // scrub: true lets Lenis handle smoothing — avoids double-lag with scrub:1
-          scrub: true,
+          pinSpacing: true,
           anticipatePin: 1,
+          refreshPriority: -1,
+          scrub: 1,
           invalidateOnRefresh: true,
           end: () => `+=${scrollWrapperRef.current?.scrollWidth || 0}`,
         }
@@ -76,7 +77,7 @@ export default function HowItWorks() {
     <section
       id="how-it-works"
       ref={containerRef}
-      className="relative bg-[#0A0A0A] text-white overflow-hidden"
+      className="relative bg-[#0A0A0A] text-white"
     >
       <div className="h-screen w-full flex flex-col justify-center">
         {/* Header */}

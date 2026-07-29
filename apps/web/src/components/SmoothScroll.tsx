@@ -12,16 +12,16 @@ if (typeof window !== 'undefined') {
 export default function SmoothScroll({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const lenis = new Lenis({
-      lerp: 0.08,
-      duration: 1.6,
+      lerp: 0.05,
+      duration: 2.0,
       smoothWheel: true,
       wheelMultiplier: 0.8,
     });
 
-    // Sync Lenis scroll position with GSAP ScrollTrigger
+    // Sync Lenis with GSAP ScrollTrigger
     lenis.on('scroll', ScrollTrigger.update);
 
-    // Use GSAP ticker to drive Lenis - the official integration method
+    // Drive Lenis from GSAP ticker (official integration)
     const tickerCallback = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(tickerCallback);
     gsap.ticker.lagSmoothing(0);
