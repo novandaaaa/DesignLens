@@ -581,11 +581,11 @@ export default function LandingPage() {
                 <div 
                   className="h-11 w-11 bg-[#8A2BE1] transition-transform duration-300 hover:scale-105 shrink-0"
                   style={{
-                    WebkitMaskImage: "url('/logo_DesignLens.png')",
+                    WebkitMaskImage: "url('apps\web\public\logo_DesignLens.png')",
                     WebkitMaskSize: "contain",
                     WebkitMaskRepeat: "no-repeat",
                     WebkitMaskPosition: "center",
-                    maskImage: "url('/logo_DesignLens.png')",
+                    maskImage: "url('apps\web\public\logo_DesignLens.png')",
                     maskSize: "contain",
                     maskRepeat: "no-repeat",
                     maskPosition: "center",

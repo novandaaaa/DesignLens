@@ -73,7 +73,7 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#c1f02a] border-t-transparent cyber-cut-sm animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#8A2BE1] border-t-transparent cyber-cut-sm animate-spin" />
       </div>
     );
   }
@@ -84,7 +84,7 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
     <div className="min-h-screen">
       <nav className="border-b border-border bg-surface-0/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center">
-          <Link href="/community" className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors">
+          <Link href="/community" data-cursor-target="true" className="cursor-target flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M15 18l-6-6 6-6" />
             </svg>
@@ -97,7 +97,7 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
         {/* Post Header */}
         <div className="glass-card p-6 mb-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 cyber-cut-sm bg-[#c1f02a] flex items-center justify-center text-white text-sm font-bold">
+            <div className="w-10 h-10 cyber-cut-sm bg-[#8A2BE1] flex items-center justify-center text-white text-sm font-bold">
               {post.website?.user?.name?.charAt(0)?.toUpperCase()}
             </div>
             <div>
@@ -111,14 +111,14 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
           </div>
 
           <h1 className="text-2xl font-bold text-text-primary mb-2">{post.website?.title}</h1>
-          <a href={post.website?.url} target="_blank" rel="noopener noreferrer" className="text-[#78b527] hover:underline text-sm">
+          <a href={post.website?.url} target="_blank" rel="noopener noreferrer" data-cursor-target="true" className="cursor-target text-[#C5ABF2] hover:underline text-sm">
             {post.website?.url} ↗
           </a>
           {post.website?.description && (
             <p className="text-text-secondary mt-3 leading-relaxed">{post.website.description}</p>
           )}
           <div className="flex gap-3 mt-4">
-            <span className="px-3 py-1 rounded-lg bg-[#c1f02a]/10 text-[#78b527] text-xs font-medium">
+            <span className="px-3 py-1 rounded-lg bg-[#8A2BE1]/10 text-[#C5ABF2] text-xs font-medium">
               {post.website?.category?.name}
             </span>
             <span className="text-sm text-text-tertiary">💬 {post._count?.comments ?? 0} komentar</span>
@@ -133,13 +133,14 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
               onChange={(e) => setComment(e.target.value)}
               placeholder="Tulis komentar atau feedback Anda..."
               rows={3}
-              className="w-full px-4 py-3 cyber-cut bg-surface-100 border placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[#c1f02a]/50 focus:border-[#c1f02a] transition-all resize-none"
+              className="w-full px-4 py-3 cyber-cut bg-surface-100 border placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[#8A2BE1]/50 focus:border-[#8A2BE1] transition-all resize-none"
             />
             <div className="flex justify-end mt-2">
               <button
                 type="submit"
+                data-cursor-target="true"
                 disabled={submitting || !comment.trim()}
-                className="px-5 py-2 cyber-cut bg-[#c1f02a] text-white text-sm font-medium hover:shadow-lg transition-all disabled:opacity-50"
+                className="cursor-target px-5 py-2 cyber-cut bg-[#8A2BE1] text-white text-sm font-medium hover:shadow-lg transition-all disabled:opacity-50"
               >
                 {submitting ? 'Mengirim...' : 'Kirim Komentar'}
               </button>
@@ -148,7 +149,7 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
         ) : (
           <div className="mb-8 p-4 cyber-cut bg-surface-100 border border-border text-center">
             <p className="text-text-secondary text-sm">
-              <Link href="/login" className="text-[#78b527] hover:underline">Masuk</Link> untuk memberikan komentar
+              <Link href="/login" data-cursor-target="true" className="cursor-target text-[#C5ABF2] hover:underline">Masuk</Link> untuk memberikan komentar
             </p>
           </div>
         )}
@@ -178,13 +179,13 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
                     <>
                       <button
                         onClick={() => handleLike(cmt.id)}
-                        className="text-xs text-text-tertiary hover:text-[#78b527] transition-colors flex items-center gap-1"
+                        className="text-xs text-text-tertiary hover:text-[#C5ABF2] transition-colors flex items-center gap-1"
                       >
                         ❤️ {cmt._count?.likes ?? 0}
                       </button>
                       <button
                         onClick={() => setReplyingTo(replyingTo === cmt.id ? null : cmt.id)}
-                        className="text-xs text-text-tertiary hover:text-[#78b527] transition-colors"
+                        className="text-xs text-text-tertiary hover:text-[#C5ABF2] transition-colors"
                       >
                         Balas
                       </button>
@@ -199,12 +200,12 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
                       value={replyText}
                       onChange={(e) => setReplyText(e.target.value)}
                       placeholder="Tulis balasan..."
-                      className="flex-1 px-3 py-2 rounded-lg bg-surface-100 border border-border text-sm placeholder:text-text-tertiary focus:outline-none focus:ring-1 focus:ring-[#c1f02a]/50"
+                      className="flex-1 px-3 py-2 rounded-lg bg-surface-100 border border-border text-sm placeholder:text-text-tertiary focus:outline-none focus:ring-1 focus:ring-[#8A2BE1]/50"
                     />
                     <button
                       onClick={() => handleReply(cmt.id)}
                       disabled={submitting}
-                      className="px-4 py-2 rounded-lg bg-[#c1f02a] text-white text-xs font-medium"
+                      className="px-4 py-2 rounded-lg bg-[#8A2BE1] text-white text-xs font-medium"
                     >
                       Balas
                     </button>

@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:4000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 interface RequestOptions {
   method?: string;
@@ -38,14 +38,19 @@ class ApiClient {
       config.body = isFormData ? (body as FormData) : JSON.stringify(body);
     }
 
-    const response = await fetch(`${this.baseUrl}/api${endpoint}`, config);
+    try {
+      const response = await fetch(`${this.baseUrl}/api${endpoint}`, config);
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Network error' }));
-      throw new Error(error.message || `HTTP ${response.status}`);
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ message: 'Network error' }));
+        throw new Error(error.message || `HTTP ${response.status}`);
+      }
+
+      return response.json();
+    } catch (err) {
+      console.error('ApiClient fetch error:', `${this.baseUrl}/api${endpoint}`, err);
+      throw err;
     }
-
-    return response.json();
   }
 
   // Auth
