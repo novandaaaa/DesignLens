@@ -191,6 +191,19 @@ h1, h2, h3, h4, h5, h6, .font-orbitron {
   animation: fade-in 0.4s ease-out forwards;
 }
 
+@keyframes marquee-right {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0%); }
+}
+
+.animate-marquee-right {
+  animation: marquee-right 30s linear infinite;
+}
+
+.animate-marquee-right:hover {
+  animation-play-state: paused;
+}
+
 /* ===== Scrollbar ===== */
 
 ::-webkit-scrollbar {
@@ -322,4 +335,14 @@ h1, h2, h3, h4, h5, h6, .font-orbitron {
   background-clip: text;
   line-height: 1;
 }
+
+/* ===== Utility ===== */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 

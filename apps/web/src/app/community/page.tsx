@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/auth-context';
 import ScrollFloat from '@/components/ScrollFloat';
 
 export default function CommunityPage() {
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [feed, setFeed] = useState<any>({ data: [], meta: { total: 0, page: 1, totalPages: 1 } });
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -35,27 +35,27 @@ export default function CommunityPage() {
       {/* Nav */}
       <nav className="border-b border-white/5 bg-transparent sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#c1f02a] flex items-center justify-center">
+          <Link href="/" data-cursor-target="true" className="cursor-target flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-[#8A2BE1] flex items-center justify-center">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="3" />
                 <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
               </svg>
             </div>
             <span className="text-lg font-bold text-white">
-              Design<span className="text-[#c1f02a]">Lens</span>
+              Design<span className="text-[#8A2BE1]">Lens</span>
             </span>
           </Link>
 
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
-              <Link href="/dashboard" className="text-sm text-white/60 hover:text-white transition-colors">
+              <Link href="/dashboard" data-cursor-target="true" className="cursor-target text-sm text-white/60 hover:text-white transition-colors">
                 Dashboard
               </Link>
             ) : (
               <Link
                 href="/login"
-                className="px-4 py-2 cyber-cut bg-[#c1f02a] text-white text-sm font-medium"
+                className="px-4 py-2 cyber-cut bg-[#8A2BE1] text-white text-sm font-medium"
               >
                 Masuk
               </Link>
@@ -73,12 +73,32 @@ export default function CommunityPage() {
       </div>
 
       {/* Solid Background Content Area (like Footer/HowItWorks) */}
-      <div className="flex-1 bg-[#0a2615] border-t border-white/5 pt-12 pb-24 relative z-20 shadow-[0_-20px_50px_rgba(0,0,0,0.5)]">
+      <div className="flex-1 bg-[#0A0A0A] border-t border-white/5 pt-12 pb-24 relative z-20 shadow-[0_-20px_50px_rgba(0,0,0,0.5)]">
         <div className="max-w-5xl mx-auto px-6">
+
+        {/* Mobile App Style Header */}
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-xl font-bold text-white tracking-wide">{user?.name || 'Community'}</h2>
+          <div className="flex items-center gap-5 text-white">
+            <button data-cursor-target="true" className="cursor-target hover:text-white/70 transition-colors">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </button>
+            <button data-cursor-target="true" className="cursor-target hover:text-white/70 transition-colors">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="1" fill="currentColor" />
+                <circle cx="19" cy="12" r="1" fill="currentColor" />
+                <circle cx="5" cy="12" r="1" fill="currentColor" />
+              </svg>
+            </button>
+          </div>
+        </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-2 border-[#c1f02a] border-t-transparent cyber-cut-sm animate-spin" />
+            <div className="w-8 h-8 border-2 border-[#8A2BE1] border-t-transparent cyber-cut-sm animate-spin" />
           </div>
         ) : feed.data.length === 0 ? (
           <div className="glass-card p-12 text-center">
@@ -92,14 +112,15 @@ export default function CommunityPage() {
               <Link
                 key={post.id}
                 href={`/community/${post.id}`}
-                className={`p-6 hover:bg-white/5 transition-colors group ${
+                data-cursor-target="true"
+                className={`cursor-target p-6 hover:bg-white/5 transition-colors group ${
                   index !== feed.data.length - 1 ? 'border-b border-border' : ''
                 }`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 cyber-cut-sm bg-[#c1f02a] flex items-center justify-center text-white font-bold shrink-0 shadow-lg">
+                      <div className="w-10 h-10 cyber-cut-sm bg-[#8A2BE1] flex items-center justify-center text-white font-bold shrink-0 shadow-lg">
                         {post.website?.user?.name?.charAt(0)?.toUpperCase()}
                       </div>
                       <div>
@@ -110,17 +131,17 @@ export default function CommunityPage() {
                       </div>
                     </div>
 
-                    <h3 className="text-lg font-bold text-text-primary group-hover:text-[#78b527] transition-colors mb-1">
+                    <h3 className="text-lg font-bold text-text-primary group-hover:text-[#C5ABF2] transition-colors mb-1">
                       {post.website?.title}
                     </h3>
-                    <span className="text-sm text-[#78b527] truncate block">{post.website?.url}</span>
+                    <span className="text-sm text-[#C5ABF2] truncate block">{post.website?.url}</span>
 
                     {post.website?.description && (
                       <p className="text-sm text-text-secondary mt-3 line-clamp-3 leading-relaxed">{post.website.description}</p>
                     )}
 
                     <div className="flex items-center gap-4 mt-4">
-                      <span className="px-3 py-1 cyber-cut-sm bg-[#c1f02a]/10 text-[#78b527] text-xs font-semibold">
+                      <span className="px-3 py-1 cyber-cut-sm bg-[#8A2BE1]/10 text-[#C5ABF2] text-xs font-semibold">
                         {post.website?.category?.name}
                       </span>
                       <span className="flex items-center gap-1.5 text-sm text-text-tertiary font-medium">
