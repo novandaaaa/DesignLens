@@ -32,21 +32,21 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center px-6 relative">
       {/* Background */}
       <div className="fixed inset-0 -z-10">
-        <div className="absolute top-[10%] left-[20%] w-500px h-500px rounded-full bg-brand-600/15 blur-[120px]" />
-        <div className="absolute bottom-[10%] right-[20%] w-400px h-400px rounded-full bg-purple-600/10 blur-[100px]" />
+        <div className="absolute top-[10%] left-[20%] w-500px h-500px cyber-cut-sm bg-[#0a2615]/15 blur-[120px]" />
+        <div className="absolute bottom-[10%] right-[20%] w-400px h-400px cyber-cut-sm bg-[#0a2615]/10 blur-[100px]" />
       </div>
 
       <div className="w-full max-w-md">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 justify-center mb-8">
-          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-brand-500 to-brand-400 flex items-center justify-center">
+          <div className="w-10 h-10 cyber-cut bg-[#c1f02a] flex items-center justify-center">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="3" />
               <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
             </svg>
           </div>
           <span className="text-xl font-bold text-text-primary">
-            Design<span className="gradient-text">Lens</span>
+            Design<span className="text-[#8A2BE1]">Lens</span>
           </span>
         </Link>
 
@@ -56,7 +56,7 @@ export default function LoginPage() {
           <p className="text-text-secondary text-center mb-8">Masuk ke akun DesignLens Anda</p>
 
           {error && (
-            <div className="mb-6 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
+            <div className="mb-6 p-3 cyber-cut bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
               {error}
             </div>
           )}
@@ -72,7 +72,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 rounded-xl bg-surface-100 border focus::border-brand-500  placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all"
+                className="w-full px-4 py-3 cyber-cut bg-surface-100 border border-border focus:outline-none focus:ring-2 focus:ring-[#8A2BE1]/50 focus:border-[#8A2BE1] placeholder:text-text-tertiary transition-all"
                 placeholder="nama@email.com"
               />
             </div>
@@ -88,7 +88,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full px-4 py-3 rounded-xl bg-surface-100 border focus::border-brand:500 placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all"
+                className="w-full px-4 py-3 cyber-cut bg-surface-100 border border-border focus:outline-none focus:ring-2 focus:ring-[#8A2BE1]/50 focus:border-[#8A2BE1] placeholder:text-text-tertiary transition-all"
                 placeholder="Minimal 6 karakter"
               />
             </div>
@@ -96,7 +96,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-xl bg-linear-to-r from-brand-500 to-brand-400 text-white font-semibold hover:shadow-lg hover:shadow-brand-500/25 transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 cyber-cut bg-[#8A2BE1] text-[#F9F9FD] font-semibold hover:shadow-lg hover:shadow-[#8A2BE1]/40 transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Memproses...' : 'Masuk'}
             </button>
@@ -104,7 +104,7 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-text-secondary mt-6">
             Belum punya akun?{' '}
-            <Link href="/register" className="text-brand-400 hover:text-brand-300 font-medium transition-colors">
+            <Link href="/register" className="text-[#8A2BE1] hover:text-[#8A2BE1]/80 font-medium transition-colors">
               Daftar Gratis
             </Link>
           </p>

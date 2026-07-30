@@ -5,10 +5,9 @@ import { useEffect, useState, useCallback } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 
-import ScrollFloat from '@/components/ScrollFloat';
-
+import Image from 'next/image';
 export default function CommunityPage() {
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
   const [feed, setFeed] = useState<any>({ data: [], meta: { total: 0, page: 1, totalPages: 1 } });
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -32,42 +31,61 @@ export default function CommunityPage() {
 
   return (
     <div className="min-h-screen relative z-10 flex flex-col">
-      {/* Nav */}
-      <nav className="border-b border-white/5 bg-transparent sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-brand-500 to-brand-400 flex items-center justify-center">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-              </svg>
-            </div>
-            <span className="text-lg font-bold text-white">
-              Design<span className="text-brand-500">Lens</span>
-            </span>
-          </Link>
+      {/* Navbar matching Landing Page */}
+      <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-6xl transition-all duration-500">
+        <div className="mx-auto px-6 py-3.5 rounded-2xl backdrop-blur-2xl border border-[#F9F9FD]/10 bg-[#0A0A0A]/60 shadow-2xl shadow-black/50">
+          <div className="flex items-center justify-between gap-6">
+            <Link href="/" data-cursor-target="true" className="cursor-target flex items-center gap-3 group shrink-0">
+              <Image 
+                src="/logo_DesignLens.png" 
+                alt="DesignLens Logo"
+                width={40}
+                height={40}
+                className="object-contain transition-transform duration-300 group-hover:scale-110 shrink-0 mix-blend-screen"
+                priority
+              />
+              <span className="text-2xl font-bold text-[#8A2BE1] hidden sm:block">DesignLens</span>
+            </Link>
 
-          <div className="flex items-center gap-4">
-            {isAuthenticated ? (
-              <Link href="/dashboard" className="text-sm text-white/60 hover:text-white transition-colors">
+            <div className="flex items-center gap-4 shrink-0">
+              <Link href="/dashboard" data-cursor-target="true" className="cursor-target text-sm text-[#F9F9FD]/70 hover:text-[#F9F9FD] transition-colors hidden sm:block">
                 Dashboard
               </Link>
-            ) : (
-              <Link
-                href="/login"
-                className="px-4 py-2 rounded-xl bg-linear-to-r from-brand-500 to-brand-400 text-white text-sm font-medium"
-              >
-                Masuk
-              </Link>
-            )}
+              {isAuthenticated ? (
+                <>
+                  <div className="h-6 w-px bg-[#F9F9FD]/10 hidden sm:block" />
+                  <div className="flex items-center gap-3">
+                    <Link href={`/profile/${user?.id}`} className="cursor-target flex items-center gap-3 group/profile">
+                      <div className="w-9 h-9 rounded-xl bg-[#8A2BE1]/20 border border-[#8A2BE1]/40 flex items-center justify-center text-[#8A2BE1] text-sm font-bold shadow-lg shadow-[#8A2BE1]/10 group-hover/profile:border-[#8A2BE1] transition-all">
+                        {user?.name?.charAt(0)?.toUpperCase()}
+                      </div>
+                      <span className="text-sm text-[#F9F9FD] font-medium hidden sm:block group-hover/profile:text-white transition-colors">{user?.name}</span>
+                    </Link>
+                    <button
+                      onClick={logout}
+                      className="cursor-target text-xs text-[#F9F9FD]/50 hover:text-red-400 transition-colors ml-2"
+                    >
+                      Keluar
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <Link
+                  href="/login"
+                  className="px-4 py-2 cyber-cut bg-[#8A2BE1] text-[#F9F9FD] text-sm font-medium hover:-translate-y-0.5 transition-transform"
+                >
+                  Masuk
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </nav>
 
       {/* Transparent Hero Area (shows Dither) */}
-      <div className="max-w-5xl mx-auto px-6 py-20 text-center relative z-10">
+      <div className="max-w-5xl mx-auto px-6 pt-32 pb-20 text-center relative z-10">
         <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 flex justify-center">
-          <ScrollFloat textClassName="text-white" stagger={0.03} animationDuration={1}>Community Feed</ScrollFloat>
+          Community Feed
         </h1>
         <p className="text-white/60 text-lg">Berikan feedback untuk desain website yang dipublikasikan</p>
       </div>
@@ -76,9 +94,29 @@ export default function CommunityPage() {
       <div className="flex-1 bg-[#0A0A0A] border-t border-white/5 pt-12 pb-24 relative z-20 shadow-[0_-20px_50px_rgba(0,0,0,0.5)]">
         <div className="max-w-5xl mx-auto px-6">
 
+        {/* Mobile App Style Header */}
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-xl font-bold text-white tracking-wide">{user?.name || 'Community'}</h2>
+          <div className="flex items-center gap-5 text-white">
+            <button data-cursor-target="true" className="cursor-target hover:text-white/70 transition-colors">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </button>
+            <button data-cursor-target="true" className="cursor-target hover:text-white/70 transition-colors">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="1" fill="currentColor" />
+                <circle cx="19" cy="12" r="1" fill="currentColor" />
+                <circle cx="5" cy="12" r="1" fill="currentColor" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-[#8A2BE1] border-t-transparent cyber-cut-sm animate-spin" />
           </div>
         ) : feed.data.length === 0 ? (
           <div className="glass-card p-12 text-center">
@@ -92,14 +130,15 @@ export default function CommunityPage() {
               <Link
                 key={post.id}
                 href={`/community/${post.id}`}
-                className={`p-6 hover:bg-white/5 transition-colors group ${
+                data-cursor-target="true"
+                className={`cursor-target p-6 hover:bg-white/5 transition-colors group ${
                   index !== feed.data.length - 1 ? 'border-b border-border' : ''
                 }`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-full bg-linear-to-br from-brand-500 to-brand-400 flex items-center justify-center text-white font-bold shrink-0 shadow-lg">
+                      <div className="w-10 h-10 cyber-cut-sm bg-[#8A2BE1] flex items-center justify-center text-white font-bold shrink-0 shadow-lg">
                         {post.website?.user?.name?.charAt(0)?.toUpperCase()}
                       </div>
                       <div>
@@ -110,17 +149,17 @@ export default function CommunityPage() {
                       </div>
                     </div>
 
-                    <h3 className="text-lg font-bold text-text-primary group-hover:text-brand-400 transition-colors mb-1">
+                    <h3 className="text-lg font-bold text-text-primary group-hover:text-[#C5ABF2] transition-colors mb-1">
                       {post.website?.title}
                     </h3>
-                    <span className="text-sm text-brand-400 truncate block">{post.website?.url}</span>
+                    <span className="text-sm text-[#C5ABF2] truncate block">{post.website?.url}</span>
 
                     {post.website?.description && (
                       <p className="text-sm text-text-secondary mt-3 line-clamp-3 leading-relaxed">{post.website.description}</p>
                     )}
 
                     <div className="flex items-center gap-4 mt-4">
-                      <span className="px-3 py-1 rounded-full bg-brand-500/10 text-brand-400 text-xs font-semibold">
+                      <span className="px-3 py-1 cyber-cut-sm bg-[#8A2BE1]/10 text-[#C5ABF2] text-xs font-semibold">
                         {post.website?.category?.name}
                       </span>
                       <span className="flex items-center gap-1.5 text-sm text-text-tertiary font-medium">
@@ -143,7 +182,7 @@ export default function CommunityPage() {
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="px-4 py-2 rounded-xl border border-border text-sm text-text-secondary hover:text-text-primary disabled:opacity-30 transition-all"
+              className="px-4 py-2 cyber-cut border border-border text-sm text-text-secondary hover:text-text-primary disabled:opacity-30 transition-all"
             >
               ← Sebelumnya
             </button>
@@ -153,7 +192,7 @@ export default function CommunityPage() {
             <button
               onClick={() => setPage((p) => Math.min(feed.meta.totalPages, p + 1))}
               disabled={page === feed.meta.totalPages}
-              className="px-4 py-2 rounded-xl border border-border text-sm text-text-secondary hover:text-text-primary disabled:opacity-30 transition-all"
+              className="px-4 py-2 cyber-cut border border-border text-sm text-text-secondary hover:text-text-primary disabled:opacity-30 transition-all"
             >
               Selanjutnya →
             </button>

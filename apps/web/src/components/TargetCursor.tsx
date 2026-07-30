@@ -55,7 +55,7 @@ const getContainingBlockOffset = (block: HTMLElement | null): Offset => {
 };
 
 const TargetCursor = ({
-  targetSelector = '.cursor-target',
+  targetSelector = 'a, button, [role="button"], .cursor-target',
   spinDuration = 2,
   hideDefaultCursor = true,
   hoverDuration = 0.2,
@@ -108,7 +108,7 @@ const TargetCursor = ({
 
     const originalCursor = document.body.style.cursor;
     if (hideDefaultCursor) {
-      document.body.style.cursor = 'none';
+      document.body.classList.add('target-cursor-active');
     }
 
     const cursor = cursorRef.current;
@@ -392,6 +392,7 @@ const TargetCursor = ({
       }
 
       spinTl.current?.kill();
+      document.body.classList.remove('target-cursor-active');
       document.body.style.cursor = originalCursor;
 
       isActiveRef.current = false;
