@@ -41,16 +41,18 @@ export default function RootLayout({
         <SmoothScroll>
           <AuthProvider>
             <div className="fixed inset-0 -z-50 pointer-events-none">
-              <Dither
-                waveColor={[0.239, 0.239, 0.239]}
-                disableAnimation={false}
-                enableMouseInteraction={true}
-                mouseRadius={0.5}
-                colorNum={4}
-                waveAmplitude={0.4}
-                waveFrequency={4}
-                waveSpeed={0.05}
-              />
+             <Dither
+  waveColor={[0.239, 0.239, 0.239]}
+  disableAnimation={false}
+  enableMouseInteraction={true}
+  mouseRadius={0.3}
+  colorNum={4}
+  waveAmplitude={0.3}
+  waveFrequency={3}
+  waveSpeed={0.05}
+>
+  <></>
+</Dither>
             </div>
             <TargetCursor />
             {children}
