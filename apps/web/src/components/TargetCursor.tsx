@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useCallback, useMemo } from 'react';
+import { useEffect, useRef, useCallback, useMemo, ReactNode } from 'react'; // <-- Tambahkan ReactNode
 import { gsap } from 'gsap';
 import './TargetCursor.css';
 
 interface TargetCursorProps {
+  children?: ReactNode; // <-- 1. TAMBAHKAN INI
   targetSelector?: string;
   spinDuration?: number;
   hideDefaultCursor?: boolean;
@@ -24,10 +25,6 @@ interface CornerPosition {
   y: number;
 }
 
-// A position: fixed element is positioned relative to the viewport UNLESS an
-// ancestor establishes a containing block (transform, perspective, filter,
-// will-change of those, or contain). When that happens, the cursor's translate
-// no longer maps to viewport coordinates, so we measure and compensate for it.
 const getContainingBlock = (element: HTMLElement | null): HTMLElement | null => {
   let node = element?.parentElement ?? null;
   while (node && node !== document.documentElement) {
@@ -55,6 +52,7 @@ const getContainingBlockOffset = (block: HTMLElement | null): Offset => {
 };
 
 const TargetCursor = ({
+  children, // <-- 2. DESTRUCTURE CHILDREN DI SINI
   targetSelector = 'a, button, [role="button"], .cursor-target',
   spinDuration = 2,
   hideDefaultCursor = true,
@@ -422,18 +420,23 @@ const TargetCursor = ({
     }
   }, [spinDuration, isMobile]);
 
+  // 3. PERBAIKAN BUG MOBILE: Jangan return null, tapi return children-nya
   if (isMobile) {
-    return null;
+    return <>{children}</>;
   }
 
+  // 4. RENDER CHILDREN AGAR HALAMAN TAMPIL
   return (
-    <div ref={cursorRef} className="target-cursor-wrapper">
-      <div ref={dotRef} className="target-cursor-dot" style={{ backgroundColor: cursorColor }} />
-      <div className="target-cursor-corner corner-tl" style={{ borderColor: cursorColor }} />
-      <div className="target-cursor-corner corner-tr" style={{ borderColor: cursorColor }} />
-      <div className="target-cursor-corner corner-br" style={{ borderColor: cursorColor }} />
-      <div className="target-cursor-corner corner-bl" style={{ borderColor: cursorColor }} />
-    </div>
+    <>
+      {children}
+      <div ref={cursorRef} className="target-cursor-wrapper">
+        <div ref={dotRef} className="target-cursor-dot" style={{ backgroundColor: cursorColor }} />
+        <div className="target-cursor-corner corner-tl" style={{ borderColor: cursorColor }} />
+        <div className="target-cursor-corner corner-tr" style={{ borderColor: cursorColor }} />
+        <div className="target-cursor-corner corner-br" style={{ borderColor: cursorColor }} />
+        <div className="target-cursor-corner corner-bl" style={{ borderColor: cursorColor }} />
+      </div>
+    </>
   );
 };
 

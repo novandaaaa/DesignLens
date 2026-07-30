@@ -249,10 +249,7 @@ function DitheredWaves({
         <shaderMaterial
           vertexShader={waveVertexShader}
           fragmentShader={waveFragmentShader}
-          uniforms={
-            // eslint-disable-next-line react-hooks/refs
-            waveUniformsRef.current
-          }
+          uniforms={waveUniformsRef.current}
         />
       </mesh>
 
@@ -273,6 +270,7 @@ function DitheredWaves({
 }
 
 export default function Dither({
+  children,
   waveSpeed = 0.05,
   waveFrequency = 3,
   waveAmplitude = 0.3,
@@ -284,23 +282,28 @@ export default function Dither({
   mouseRadius = 1
 }) {
   return (
-    <Canvas
-      className="dither-container"
-      camera={{ position: [0, 0, 6] }}
-      dpr={1}
-      gl={{ antialias: true, preserveDrawingBuffer: true }}
-    >
-      <DitheredWaves
-        waveSpeed={waveSpeed}
-        waveFrequency={waveFrequency}
-        waveAmplitude={waveAmplitude}
-        waveColor={waveColor}
-        colorNum={colorNum}
-        pixelSize={pixelSize}
-        disableAnimation={disableAnimation}
-        enableMouseInteraction={enableMouseInteraction}
-        mouseRadius={mouseRadius}
-      />
-    </Canvas>
+    <>
+      {children}
+      <div className="fixed inset-0 z-50 pointer-events-none">
+        <Canvas
+          className="dither-container"
+          camera={{ position: [0, 0, 6] }}
+          dpr={1}
+          gl={{ antialias: true, preserveDrawingBuffer: true }}
+        >
+          <DitheredWaves
+            waveSpeed={waveSpeed}
+            waveFrequency={waveFrequency}
+            waveAmplitude={waveAmplitude}
+            waveColor={waveColor}
+            colorNum={colorNum}
+            pixelSize={pixelSize}
+            disableAnimation={disableAnimation}
+            enableMouseInteraction={enableMouseInteraction}
+            mouseRadius={mouseRadius}
+          />
+        </Canvas>
+      </div>
+    </>
   );
 }
