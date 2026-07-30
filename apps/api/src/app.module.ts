@@ -11,6 +11,7 @@ import { WebsitesModule } from './websites/websites.module';
 import { AiReviewModule } from './ai-review/ai-review.module';
 import { CommunityModule } from './community/community.module';
 import { ScreenshotsModule } from './screenshots/screenshots.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { ScreenshotsModule } from './screenshots/screenshots.module';
     AiReviewModule,
     CommunityModule,
     ScreenshotsModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

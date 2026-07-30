@@ -7,18 +7,22 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(uuid())
-  name          String
-  email         String         @unique
-  passwordHash  String         @map("password_hash")
-  avatar        String?
-  role          Role           @default(USER)
-  createdAt     DateTime       @default(now()) @map("created_at")
-  updatedAt     DateTime       @updatedAt @map("updated_at")
-  comments      Comment[]
-  likes         Like[]
-  notifications Notification[]
-  websites      Website[]
+  id              String           @id @default(uuid())
+  name            String
+  email           String           @unique
+  passwordHash    String           @map("password_hash")
+  avatar          String?
+  bio             String?
+  specializations String[]
+  reputationScore Int              @default(0) @map("reputation_score")
+  role            Role             @default(USER)
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  comments        Comment[]
+  reactions       Reaction[]
+  mentions        CommentMention[]
+  notifications   Notification[]
+  websites        Website[]
 
   @@map("users")
 }
@@ -53,12 +57,13 @@ model Website {
 }
 
 model Screenshot {
-  id        String   @id @default(uuid())
-  websiteId String   @map("website_id")
-  fileUrl   String   @map("file_url")
-  type      String   @default("auto")
-  createdAt DateTime @default(now()) @map("created_at")
-  website   Website  @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  id        String    @id @default(uuid())
+  websiteId String    @map("website_id")
+  fileUrl   String    @map("file_url")
+  type      String    @default("auto")
+  createdAt DateTime  @default(now()) @map("created_at")
+  website   Website   @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  comments  Comment[]
 
   @@map("screenshots")
 }
@@ -97,32 +102,50 @@ model CommunityPost {
 }
 
 model Comment {
-  id              String        @id @default(uuid())
-  postId          String        @map("post_id")
-  userId          String        @map("user_id")
-  parentCommentId String?       @map("parent_comment_id")
+  id              String           @id @default(uuid())
+  postId          String           @map("post_id")
+  userId          String           @map("user_id")
+  parentCommentId String?          @map("parent_comment_id")
+  screenshotId    String?          @map("screenshot_id")
   content         String
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
-  parentComment   Comment?      @relation("CommentReplies", fields: [parentCommentId], references: [id])
-  replies         Comment[]     @relation("CommentReplies")
-  post            CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  likes           Like[]
+  xPct            Float?
+  yPct            Float?
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  parentComment   Comment?         @relation("CommentReplies", fields: [parentCommentId], references: [id])
+  replies         Comment[]        @relation("CommentReplies")
+  post            CommunityPost    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  screenshot      Screenshot?      @relation(fields: [screenshotId], references: [id], onDelete: SetNull)
+  reactions       Reaction[]
+  mentions        CommentMention[]
 
   @@map("comments")
 }
 
-model Like {
+model Reaction {
+  id        String       @id @default(uuid())
+  userId    String       @map("user_id")
+  commentId String       @map("comment_id")
+  type      ReactionType
+  createdAt DateTime     @default(now()) @map("created_at")
+  comment   Comment      @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, commentId])
+  @@map("reactions")
+}
+
+model CommentMention {
   id        String   @id @default(uuid())
-  userId    String   @map("user_id")
   commentId String   @map("comment_id")
+  userId    String   @map("user_id")
   createdAt DateTime @default(now()) @map("created_at")
   comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, commentId])
-  @@map("likes")
+  @@unique([commentId, userId])
+  @@map("comment_mentions")
 }
 
 model Notification {
@@ -162,4 +185,11 @@ enum NotificationType {
   REPLY
   AI_REVIEW_COMPLETE
   SYSTEM
+  MENTION
+}
+
+enum ReactionType {
+  AGREE
+  NEEDS_REVIEW
+  DISAGREE
 }

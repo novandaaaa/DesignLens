@@ -5,10 +5,9 @@ import { useEffect, useState, useCallback } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 
-import ScrollFloat from '@/components/ScrollFloat';
-
+import Image from 'next/image';
 export default function CommunityPage() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
   const [feed, setFeed] = useState<any>({ data: [], meta: { total: 0, page: 1, totalPages: 1 } });
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -32,42 +31,61 @@ export default function CommunityPage() {
 
   return (
     <div className="min-h-screen relative z-10 flex flex-col">
-      {/* Nav */}
-      <nav className="border-b border-white/5 bg-transparent sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" data-cursor-target="true" className="cursor-target flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#8A2BE1] flex items-center justify-center">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-              </svg>
-            </div>
-            <span className="text-lg font-bold text-white">
-              Design<span className="text-[#8A2BE1]">Lens</span>
-            </span>
-          </Link>
+      {/* Navbar matching Landing Page */}
+      <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-6xl transition-all duration-500">
+        <div className="mx-auto px-6 py-3.5 rounded-2xl backdrop-blur-2xl border border-[#F9F9FD]/10 bg-[#0A0A0A]/60 shadow-2xl shadow-black/50">
+          <div className="flex items-center justify-between gap-6">
+            <Link href="/" data-cursor-target="true" className="cursor-target flex items-center gap-3 group shrink-0">
+              <Image 
+                src="/logo_DesignLens.png" 
+                alt="DesignLens Logo"
+                width={40}
+                height={40}
+                className="object-contain transition-transform duration-300 group-hover:scale-110 shrink-0 mix-blend-screen"
+                priority
+              />
+              <span className="text-2xl font-bold text-[#8A2BE1] hidden sm:block">DesignLens</span>
+            </Link>
 
-          <div className="flex items-center gap-4">
-            {isAuthenticated ? (
-              <Link href="/dashboard" data-cursor-target="true" className="cursor-target text-sm text-white/60 hover:text-white transition-colors">
+            <div className="flex items-center gap-4 shrink-0">
+              <Link href="/dashboard" data-cursor-target="true" className="cursor-target text-sm text-[#F9F9FD]/70 hover:text-[#F9F9FD] transition-colors hidden sm:block">
                 Dashboard
               </Link>
-            ) : (
-              <Link
-                href="/login"
-                className="px-4 py-2 cyber-cut bg-[#8A2BE1] text-white text-sm font-medium"
-              >
-                Masuk
-              </Link>
-            )}
+              {isAuthenticated ? (
+                <>
+                  <div className="h-6 w-px bg-[#F9F9FD]/10 hidden sm:block" />
+                  <div className="flex items-center gap-3">
+                    <Link href={`/profile/${user?.id}`} className="cursor-target flex items-center gap-3 group/profile">
+                      <div className="w-9 h-9 rounded-xl bg-[#8A2BE1]/20 border border-[#8A2BE1]/40 flex items-center justify-center text-[#8A2BE1] text-sm font-bold shadow-lg shadow-[#8A2BE1]/10 group-hover/profile:border-[#8A2BE1] transition-all">
+                        {user?.name?.charAt(0)?.toUpperCase()}
+                      </div>
+                      <span className="text-sm text-[#F9F9FD] font-medium hidden sm:block group-hover/profile:text-white transition-colors">{user?.name}</span>
+                    </Link>
+                    <button
+                      onClick={logout}
+                      className="cursor-target text-xs text-[#F9F9FD]/50 hover:text-red-400 transition-colors ml-2"
+                    >
+                      Keluar
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <Link
+                  href="/login"
+                  className="px-4 py-2 cyber-cut bg-[#8A2BE1] text-[#F9F9FD] text-sm font-medium hover:-translate-y-0.5 transition-transform"
+                >
+                  Masuk
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </nav>
 
       {/* Transparent Hero Area (shows Dither) */}
-      <div className="max-w-5xl mx-auto px-6 py-20 text-center relative z-10">
+      <div className="max-w-5xl mx-auto px-6 pt-32 pb-20 text-center relative z-10">
         <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 flex justify-center">
-          <ScrollFloat textClassName="text-white" stagger={0.03} animationDuration={1}>Community Feed</ScrollFloat>
+          Community Feed
         </h1>
         <p className="text-white/60 text-lg">Berikan feedback untuk desain website yang dipublikasikan</p>
       </div>

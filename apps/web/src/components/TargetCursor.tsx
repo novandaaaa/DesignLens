@@ -55,7 +55,7 @@ const getContainingBlockOffset = (block: HTMLElement | null): Offset => {
 };
 
 const TargetCursor = ({
-  targetSelector = '.cursor-target',
+  targetSelector = 'a, button, [role="button"], .cursor-target',
   spinDuration = 2,
   hideDefaultCursor = true,
   hoverDuration = 0.2,

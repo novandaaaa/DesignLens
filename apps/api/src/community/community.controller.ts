@@ -12,6 +12,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Public } from '../auth/decorators/public.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { ReactionType } from '@prisma/client';
 
 @Controller('community')
 export class CommunityController {
@@ -29,6 +30,7 @@ export class CommunityController {
   }
 
   @Public()
+  @UseGuards(JwtAuthGuard)
   @Get('feed')
   getFeed(@Query('page') page?: string, @Query('limit') limit?: string) {
     return this.communityService.getFeed(
@@ -38,9 +40,10 @@ export class CommunityController {
   }
 
   @Public()
+  @UseGuards(JwtAuthGuard)
   @Get('posts/:id')
-  getPost(@Param('id') id: string) {
-    return this.communityService.getPost(id);
+  getPost(@Param('id') id: string, @CurrentUser('id') userId?: string) {
+    return this.communityService.getPost(id, userId);
   }
 
   // ===== Comments =====
@@ -52,7 +55,7 @@ export class CommunityController {
     @CurrentUser('id') userId: string,
     @Body() dto: CreateCommentDto,
   ) {
-    return this.communityService.addComment(postId, userId, dto.content);
+    return this.communityService.addComment(postId, userId, dto);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -62,17 +65,18 @@ export class CommunityController {
     @CurrentUser('id') userId: string,
     @Body() dto: CreateCommentDto,
   ) {
-    return this.communityService.replyComment(commentId, userId, dto.content);
+    return this.communityService.replyComment(commentId, userId, dto);
   }
 
-  // ===== Likes =====
+  // ===== Reactions =====
 
   @UseGuards(JwtAuthGuard)
-  @Post('comments/:commentId/like')
-  toggleLike(
+  @Post('comments/:commentId/react')
+  reactToComment(
     @Param('commentId') commentId: string,
     @CurrentUser('id') userId: string,
+    @Body('type') type: ReactionType,
   ) {
-    return this.communityService.toggleLike(commentId, userId);
+    return this.communityService.reactToComment(commentId, userId, type);
   }
 }
