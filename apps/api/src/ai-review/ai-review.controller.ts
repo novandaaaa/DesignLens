@@ -23,4 +23,9 @@ export class AiReviewController {
   ) {
     return this.aiReviewService.getReview(websiteId, userId);
   }
+
+  @Get('reset-stuck')
+  resetStuck() {
+    return this.aiReviewService.resetStuck();
+  }
 }

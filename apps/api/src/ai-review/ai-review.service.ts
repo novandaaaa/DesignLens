@@ -43,7 +43,7 @@ export class AiReviewService {
     const envModel = this.configService.get<string>('OPENROUTER_MODEL');
     this.model =
       envModel === 'qwen/qwen3-coder:free' || !envModel
-        ? 'google/gemma-4-26b-a4b-it:free' // model vision gratis yang valid
+        ? 'google/gemma-4-26b-a4b-it:free'
         : envModel;
   }
 
@@ -63,7 +63,8 @@ export class AiReviewService {
     }
 
     if (website.aiReview && website.aiReview.status === 'PROCESSING') {
-      throw new BadRequestException('AI Review sedang diproses');
+      // throw new BadRequestException('AI Review sedang diproses');
+      // Bypass sementara agar user bisa klik ulang saat stuck
     }
 
     // Create or update AI review record with PROCESSING status
@@ -149,6 +150,14 @@ export class AiReviewService {
     }
 
     return review;
+  }
+
+  async resetStuck() {
+    const result = await this.prisma.aiReview.updateMany({
+      where: { status: 'PROCESSING' },
+      data: { status: 'FAILED' },
+    });
+    return { message: 'Reset done', count: result.count };
   }
 
   private async processReview(

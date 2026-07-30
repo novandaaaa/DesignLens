@@ -156,6 +156,28 @@ class ApiClient {
       body: data,
     });
   }
+
+  // ===== Community Post CRUD =====
+
+  async updateCommunityPost(postId: string, data: { title?: string; description?: string; targetAudience?: string }) {
+    return this.request<any>(`/community/posts/${postId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+  }
+
+  async unpublishCommunityPost(postId: string) {
+    return this.request<any>(`/community/posts/${postId}/unpublish`, {
+      method: 'PATCH',
+    });
+  }
+
+  async deleteCommunityPost(postId: string) {
+    return this.request<any>(`/community/posts/${postId}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 export const api = new ApiClient(API_URL);
