@@ -7,12 +7,12 @@ import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 
 const SCORE_COLORS: Record<string, string> = {
-  layout: 'bg-[#c1f02a]',
-  typography: 'bg-[#78b527]',
-  color: 'bg-[#0a2615]',
-  navigation: 'bg-[#c1f02a]',
-  cta: 'bg-[#78b527]',
-  accessibility: 'bg-[#0a2615]',
+  layout: 'bg-[#8A2BE1]',
+  typography: 'bg-[#8A2BE1]/80',
+  color: 'bg-[#8A2BE1]/60',
+  navigation: 'bg-[#8A2BE1]',
+  cta: 'bg-[#8A2BE1]/80',
+  accessibility: 'bg-[#8A2BE1]/60',
 };
 
 function ScoreRing({ score, size = 80 }: { score: number; size?: number }) {
@@ -105,7 +105,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   if (loading || authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#c1f02a] border-t-transparent cyber-cut-sm animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#8A2BE1] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -125,16 +125,18 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const reasoning = review?.reasoning as Record<string, any> | null;
 
   // Tombol AI Review muncul kalau: belum pernah ada review sama sekali,
-  // ATAU review sebelumnya berstatus FAILED (butuh retry).
-  const showAiButton = !review || review.status === 'FAILED';
+  // ATAU review sebelumnya berstatus FAILED (butuh retry), atau sedang PROCESSING tapi stuck.
+  const showAiButton = !review || review.status === 'FAILED' || review.status === 'PROCESSING';
 
   return (
-    <div className="min-h-screen">
-      <nav className="border-b border-border bg-surface-0/80 backdrop-blur-xl sticky top-0 z-50"></nav>
-      <nav className="border-b border-border bg-surface-0/80 backdrop-blur-xl sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center">
-          <Link href="/dashboard" className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <div className="min-h-screen text-[#F9F9FD] bg-[#0A0A0A] pt-6 relative">
+      {/* Background layer */}
+      <div className="fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#8A2BE1]/10 via-[#0A0A0A] to-[#0A0A0A]" />
+
+      <nav className="sticky top-0 z-50 transition-all duration-500 mb-8 w-[95%] max-w-6xl mx-auto">
+        <div className="mx-auto px-6 py-3.5 rounded-2xl backdrop-blur-2xl border border-white/10 bg-[#0A0A0A]/60 shadow-2xl shadow-black/50 flex items-center">
+          <Link href="/dashboard" className="cursor-target flex items-center gap-2 text-white/70 hover:text-white transition-colors text-sm font-medium group">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:-translate-x-1 transition-transform">
               <path d="M15 18l-6-6 6-6" />
             </svg>
             Dashboard
@@ -142,20 +144,20 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         </div>
       </nav>
 
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      <div className="max-w-6xl mx-auto px-6 pb-20">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-text-primary mb-1">{website.title}</h1>
-            <a href={website.url} target="_blank" rel="noopener noreferrer" className="text-[#78b527] hover:underline text-sm">
+            <h1 className="text-4xl font-bold text-white mb-2">{website.title}</h1>
+            <a href={website.url} target="_blank" rel="noopener noreferrer" className="cursor-target text-[#8A2BE1] hover:text-white transition-colors hover:underline text-sm font-medium">
               {website.url} ↗
             </a>
-            <div className="flex items-center gap-3 mt-3">
-              <span className="px-3 py-1 rounded-lg bg-[#c1f02a]/10 text-[#78b527] text-xs font-medium">
+            <div className="flex items-center gap-3 mt-4">
+              <span className="px-3 py-1 rounded-full bg-[#8A2BE1]/20 border border-[#8A2BE1]/30 text-[#8A2BE1] text-xs font-semibold">
                 {website.category?.name}
               </span>
               {website.description && (
-                <span className="text-sm text-text-tertiary">{website.description}</span>
+                <span className="text-sm text-white/50 border-l border-white/10 pl-3">{website.description}</span>
               )}
             </div>
           </div>
@@ -165,7 +167,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               <button
                 onClick={handleTriggerAi}
                 disabled={triggeringAi}
-                className="px-4 py-2 cyber-cut bg-[#c1f02a] text-white text-sm font-medium hover:shadow-lg transition-all disabled:opacity-50"
+                className="cursor-target px-5 py-2.5 rounded-xl bg-[#8A2BE1] text-white text-sm font-semibold hover:shadow-lg hover:shadow-[#8A2BE1]/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {triggeringAi
                   ? 'Processing...'
@@ -178,7 +180,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               <button
                 onClick={handlePublish}
                 disabled={publishing}
-                className="px-4 py-2 cyber-cut border border-accent-500 text-accent-500 text-sm font-medium hover:bg-accent-500/10 transition-all disabled:opacity-50"
+                className="cursor-target px-5 py-2.5 rounded-xl border border-white/10 bg-white/5 text-white/90 text-sm font-semibold hover:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {publishing ? 'Publishing...' : '👥 Publish ke Komunitas'}
               </button>
@@ -190,33 +192,33 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         {review && review.status === 'COMPLETED' && (
           <div className="space-y-6">
             {/* Overall Score */}
-            <div className="glass-card p-8 flex flex-col sm:flex-row items-center gap-8">
+            <div className="p-8 rounded-3xl border border-white/5 bg-white/5 backdrop-blur-xl shadow-2xl flex flex-col sm:flex-row items-center gap-8">
               <div className="relative">
                 <ScoreRing score={review.overallScore ?? 0} size={120} />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-3xl font-bold text-text-primary">{review.overallScore}</span>
+                  <span className="text-4xl font-bold text-white">{review.overallScore}</span>
                 </div>
               </div>
               <div>
-                <h2 className="text-xl font-bold text-text-primary mb-1">Overall Score</h2>
-                <p className="text-text-secondary text-sm">
+                <h2 className="text-2xl font-bold text-white mb-2">Overall Score</h2>
+                <p className="text-white/70 text-base">
                   {review.overallScore >= 80 ? 'Desain website Anda sudah sangat baik! 🎉' :
                    review.overallScore >= 60 ? 'Cukup baik, ada beberapa area yang bisa ditingkatkan.' :
                    'Masih ada banyak ruang untuk perbaikan.'}
                 </p>
-                <p className="text-xs text-text-tertiary mt-2">Model: {review.modelUsed}</p>
+                <p className="text-xs text-white/40 mt-3 font-mono">Model: {review.modelUsed}</p>
               </div>
             </div>
 
             {/* Score Grid */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {scores.map((item) => (
-                <div key={item.key} className="glass-card p-5 hover:border-[#c1f02a]/20 transition-all duration-300">
-                  <div className="text-xs text-text-tertiary mb-2 uppercase tracking-wider">{item.label}</div>
-                  <div className="text-3xl font-bold text-text-primary mb-3">{item.score ?? '-'}</div>
-                  <div className="w-full h-2 cyber-cut-sm bg-surface-200 overflow-hidden">
+                <div key={item.key} className="p-6 rounded-2xl border border-white/5 bg-white/5 backdrop-blur-xl hover:bg-white/10 transition-all duration-300">
+                  <div className="text-xs text-white/50 mb-2 uppercase tracking-wider font-semibold">{item.label}</div>
+                  <div className="text-4xl font-bold text-white mb-4">{item.score ?? '-'}</div>
+                  <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
                     <div
-                      className={`h-full cyber-cut-sm ${SCORE_COLORS[item.key]} transition-all duration-1000`}
+                      className={`h-full rounded-full ${SCORE_COLORS[item.key]} transition-all duration-1000 shadow-[0_0_10px_currentColor]`}
                       style={{ width: `${item.score ?? 0}%` }}
                     />
                   </div>
@@ -227,32 +229,32 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             {/* Detailed Reasoning */}
             {reasoning && (
               <div className="space-y-4">
-                <h3 className="text-xl font-bold text-text-primary">Detail Evaluasi</h3>
-                {Object.entries(reasoning).map(([key, value]) => {
+                <h3 className="text-2xl font-bold text-white mt-8 mb-4">Detail Evaluasi</h3>
+                {Object.entries(reasoning || {}).map(([key, value]) => {
                   if (key === 'overall_recommendation') return null;
                   const data = value as AiCategoryResult;
                   if (!data?.reasoning) return null;
 
                   return (
-                    <div key={key} className="glass-card p-5">
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="font-semibold text-text-primary capitalize">{key}</h4>
-                        <span className={`px-2 py-0.5 rounded-md text-xs font-bold ${
-                          (data.score ?? 0) >= 80 ? 'bg-green-500/10 text-green-400' :
-                          (data.score ?? 0) >= 60 ? 'bg-yellow-500/10 text-yellow-400' :
-                          'bg-red-500/10 text-red-400'
+                    <div key={key} className="p-6 rounded-2xl border border-white/5 bg-white/5 backdrop-blur-xl">
+                      <div className="flex items-center justify-between mb-4">
+                        <h4 className="font-semibold text-white text-lg capitalize">{key}</h4>
+                        <span className={`px-3 py-1 rounded-lg text-sm font-bold ${
+                          (data.score ?? 0) >= 80 ? 'bg-green-500/20 text-green-300 border border-green-500/30' :
+                          (data.score ?? 0) >= 60 ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30' :
+                          'bg-red-500/20 text-red-300 border border-red-500/30'
                         }`}>
                           {data.score}/100
                         </span>
                       </div>
-                      <p className="text-sm text-text-secondary leading-relaxed mb-3">{data.reasoning}</p>
+                      <p className="text-sm text-white/70 leading-relaxed mb-4">{data.reasoning}</p>
                       {data.recommendations && data.recommendations.length > 0 && (
                         <div>
-                          <div className="text-xs font-medium text-text-tertiary mb-1.5">Rekomendasi:</div>
-                          <ul className="space-y-1">
+                          <div className="text-xs font-semibold text-white/50 mb-2 uppercase tracking-wider">Rekomendasi:</div>
+                          <ul className="space-y-2">
                             {data.recommendations.map((rec: string, i: number) => (
-                              <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
-                                <span className="text-[#78b527] mt-0.5">•</span>
+                              <li key={i} className="flex items-start gap-3 text-sm text-white/80">
+                                <span className="text-[#8A2BE1] mt-0.5 shrink-0">✦</span>
                                 {rec}
                               </li>
                             ))}
@@ -267,12 +269,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
             {/* Overall Recommendation */}
             {review.recommendation && (
-              <div className="glass-card p-5 border-[#c1f02a]/20">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-lg">💡</span>
-                  <h4 className="font-semibold text-text-primary">Rekomendasi Utama</h4>
+              <div className="p-6 rounded-2xl border border-white/5 bg-[#8A2BE1]/10 backdrop-blur-xl">
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-xl">💡</span>
+                  <h4 className="font-bold text-white text-lg">Rekomendasi Utama</h4>
                 </div>
-                <p className="text-sm text-text-secondary leading-relaxed">{review.recommendation}</p>
+                <p className="text-white/80 leading-relaxed">{review.recommendation}</p>
               </div>
             )}
           </div>
@@ -280,23 +282,23 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
         {/* Processing State */}
         {review && review.status === 'PROCESSING' && (
-          <div className="glass-card p-12 text-center">
-            <div className="w-12 h-12 border-3 border-[#c1f02a] border-t-transparent cyber-cut-sm animate-spin mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-text-primary mb-2">AI sedang menganalisis...</h2>
-            <p className="text-text-secondary">Mohon tunggu beberapa saat. Halaman akan otomatis diperbarui.</p>
-            <button onClick={loadWebsite} className="mt-4 text-sm text-[#78b527] hover:underline">
-              Refresh
+          <div className="p-12 rounded-3xl border border-white/5 bg-white/5 backdrop-blur-xl text-center shadow-2xl">
+            <div className="w-16 h-16 border-4 border-[#8A2BE1] border-t-transparent rounded-full animate-spin mx-auto mb-6 shadow-[0_0_15px_#8A2BE1]" />
+            <h2 className="text-2xl font-bold text-white mb-3">AI sedang menganalisis...</h2>
+            <p className="text-white/60 mb-6">Mohon tunggu beberapa saat. Halaman akan otomatis diperbarui.</p>
+            <button onClick={loadWebsite} className="text-sm text-[#8A2BE1] hover:text-white transition-colors underline underline-offset-4 font-medium cursor-target">
+              Refresh Halaman
             </button>
           </div>
         )}
 
         {/* Failed State */}
         {review && review.status === 'FAILED' && (
-          <div className="glass-card p-12 text-center border-red-500/20">
-            <div className="text-5xl mb-4">❌</div>
-            <h2 className="text-xl font-bold text-red-400 mb-2">Proses AI Gagal</h2>
-            <p className="text-text-secondary mb-6">Terjadi kesalahan saat memproses review (mungkin API key tidak valid atau website tidak dapat diakses).</p>
-            <button onClick={handleTriggerAi} disabled={triggeringAi} className="px-4 py-2 cyber-cut bg-red-500/10 text-red-400 hover:bg-red-500/20 font-medium transition-all">
+          <div className="p-12 rounded-3xl border border-red-500/20 bg-red-500/5 backdrop-blur-xl text-center shadow-2xl">
+            <div className="text-6xl mb-6">❌</div>
+            <h2 className="text-2xl font-bold text-red-400 mb-3">Proses AI Gagal</h2>
+            <p className="text-red-400/70 mb-8 max-w-md mx-auto">Terjadi kesalahan saat memproses review (mungkin API key tidak valid atau website tidak dapat diakses).</p>
+            <button onClick={handleTriggerAi} disabled={triggeringAi} className="cursor-target px-6 py-3 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 font-semibold transition-all">
               {triggeringAi ? 'Mencoba lagi...' : 'Coba Lagi'}
             </button>
           </div>
@@ -304,28 +306,28 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
         {/* No Review */}
         {!review && (
-          <div className="glass-card p-12 text-center">
-            <div className="text-5xl mb-4">🤖</div>
-            <h2 className="text-xl font-bold text-text-primary mb-2">Belum ada AI Review</h2>
-            <p className="text-text-secondary mb-6">Klik tombol AI Review di atas untuk memulai evaluasi</p>
+          <div className="p-12 rounded-3xl border border-white/5 bg-white/5 backdrop-blur-xl text-center shadow-2xl">
+            <div className="text-6xl mb-6">🤖</div>
+            <h2 className="text-2xl font-bold text-white mb-3">Belum ada AI Review</h2>
+            <p className="text-white/60">Klik tombol AI Review di atas untuk memulai evaluasi otomatis</p>
           </div>
         )}
 
         {/* Community Post Link */}
         {website.communityPost?.status === 'PUBLISHED' && (
-          <div className="mt-6 glass-card p-5 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-lg">👥</span>
+          <div className="mt-8 p-6 rounded-2xl border border-white/5 bg-white/5 backdrop-blur-xl flex flex-col sm:flex-row sm:items-center justify-between gap-6 shadow-xl">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-[#8A2BE1]/20 flex items-center justify-center text-2xl border border-[#8A2BE1]/30">👥</div>
               <div>
-                <div className="font-medium text-text-primary">Community Post</div>
-                <div className="text-sm text-text-secondary">
-                  {website.communityPost._count?.comments ?? 0} komentar
+                <div className="font-bold text-white text-lg mb-1">Community Post</div>
+                <div className="text-sm text-white/50 font-medium">
+                  {website.communityPost._count?.comments ?? 0} komentar diskusi
                 </div>
               </div>
             </div>
             <Link
               href={`/community/${website.communityPost.id}`}
-              className="px-4 py-2 cyber-cut border border-border text-sm text-text-secondary hover:text-[#78b527] hover:border-[#c1f02a]/30 transition-all"
+              className="cursor-target px-5 py-2.5 rounded-xl border border-[#8A2BE1]/30 bg-[#8A2BE1]/10 text-white font-semibold hover:bg-[#8A2BE1]/20 transition-all text-sm whitespace-nowrap"
             >
               Lihat Diskusi →
             </Link>

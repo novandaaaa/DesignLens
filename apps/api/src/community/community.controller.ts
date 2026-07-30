@@ -2,6 +2,8 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
+  Delete,
   Param,
   Body,
   Query,
@@ -44,6 +46,34 @@ export class CommunityController {
   @Get('posts/:id')
   getPost(@Param('id') id: string, @CurrentUser('id') userId?: string) {
     return this.communityService.getPost(id, userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('posts/:id')
+  updatePost(
+    @Param('id') id: string,
+    @CurrentUser('id') userId: string,
+    @Body() dto: { title?: string; description?: string; targetAudience?: string },
+  ) {
+    return this.communityService.updatePost(id, userId, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('posts/:id/unpublish')
+  unpublishPost(
+    @Param('id') id: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.communityService.unpublishPost(id, userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('posts/:id')
+  deletePost(
+    @Param('id') id: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.communityService.deletePost(id, userId);
   }
 
   // ===== Comments =====

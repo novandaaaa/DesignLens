@@ -39,11 +39,11 @@ export class ScreenshotsService {
 
       const page = await context.newPage();
 
-      // Navigate to the page and wait for it to load (faster than networkidle)
-      await page.goto(url, { waitUntil: 'load', timeout: 15000 });
+      // Navigate to the page and wait for domcontentloaded (much faster)
+      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 10000 });
 
-      // Small delay to allow any animations or lazy-loaded images to settle
-      await page.waitForTimeout(1000);
+      // Small delay to allow initial styles/images to settle
+      await page.waitForTimeout(500);
 
       const fileName = `${websiteId}-${Date.now()}.png`;
       const absoluteDir = path.resolve(process.cwd(), this.screenshotDir);

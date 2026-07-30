@@ -100,6 +100,7 @@ export class CommunityService {
             user: { select: { id: true, name: true, avatar: true } },
             category: true,
             screenshots: true,
+            aiReview: true,
           },
         },
         comments: {
@@ -191,6 +192,61 @@ export class CommunityService {
 
     delete comment.reactions; // Hide full list
     return comment;
+  }
+
+  async updatePost(postId: string, userId: string, data: { title?: string; description?: string; targetAudience?: string }) {
+    const post = await this.prisma.communityPost.findUnique({
+      where: { id: postId },
+      include: { website: true },
+    });
+
+    if (!post) throw new NotFoundException('Postingan tidak ditemukan');
+    if (post.website.userId !== userId) throw new ForbiddenException('Anda tidak memiliki akses');
+
+    await this.prisma.website.update({
+      where: { id: post.websiteId },
+      data: {
+        title: data.title,
+        description: data.description,
+        targetAudience: data.targetAudience,
+      },
+    });
+
+    return this.getPost(postId, userId);
+  }
+
+  async unpublishPost(postId: string, userId: string) {
+    const post = await this.prisma.communityPost.findUnique({
+      where: { id: postId },
+      include: { website: true },
+    });
+
+    if (!post) throw new NotFoundException('Postingan tidak ditemukan');
+    if (post.website.userId !== userId) throw new ForbiddenException('Anda tidak memiliki akses');
+
+    const updated = await this.prisma.communityPost.update({
+      where: { id: postId },
+      data: { status: 'DRAFT' },
+    });
+
+    return updated;
+  }
+
+  async deletePost(postId: string, userId: string) {
+    const post = await this.prisma.communityPost.findUnique({
+      where: { id: postId },
+      include: { website: true },
+    });
+
+    if (!post) throw new NotFoundException('Postingan tidak ditemukan');
+    if (post.website.userId !== userId) throw new ForbiddenException('Anda tidak memiliki akses');
+
+    // Only delete the community post, keep the website
+    await this.prisma.communityPost.delete({
+      where: { id: postId },
+    });
+
+    return { success: true };
   }
 
   // ===== Mentions Helper =====
