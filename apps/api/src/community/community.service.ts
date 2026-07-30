@@ -5,6 +5,8 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { ReactionType } from '@prisma/client';
+import { CreateCommentDto } from './dto/create-comment.dto';
 
 @Injectable()
 export class CommunityService {
@@ -89,7 +91,7 @@ export class CommunityService {
     };
   }
 
-  async getPost(postId: string) {
+  async getPost(postId: string, userId?: string) {
     const post = await this.prisma.communityPost.findUnique({
       where: { id: postId },
       include: {
@@ -103,15 +105,35 @@ export class CommunityService {
         comments: {
           where: { parentCommentId: null },
           include: {
-            user: { select: { id: true, name: true, avatar: true } },
+            user: {
+              select: {
+                id: true,
+                name: true,
+                avatar: true,
+                specializations: true,
+              },
+            },
+            mentions: {
+              include: { user: { select: { id: true, name: true } } },
+            },
+            reactions: true,
             replies: {
               include: {
-                user: { select: { id: true, name: true, avatar: true } },
-                _count: { select: { likes: true } },
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    avatar: true,
+                    specializations: true,
+                  },
+                },
+                reactions: true,
+                mentions: {
+                  include: { user: { select: { id: true, name: true } } },
+                },
               },
               orderBy: { createdAt: 'asc' },
             },
-            _count: { select: { likes: true } },
           },
           orderBy: { createdAt: 'desc' },
         },
@@ -123,12 +145,103 @@ export class CommunityService {
       throw new NotFoundException('Post tidak ditemukan');
     }
 
+    // Apply blind voting logic
+    post.comments = post.comments.map((comment) =>
+      this.applyBlindVoting(comment, userId),
+    ) as any;
+
     return post;
+  }
+
+  private applyBlindVoting(comment: any, currentUserId?: string) {
+    const userHasReacted =
+      currentUserId &&
+      comment.reactions.some((r: any) => r.userId === currentUserId);
+    const isOwner = currentUserId && comment.userId === currentUserId;
+
+    // Group reactions
+    const reactionCounts = {
+      AGREE: 0,
+      NEEDS_REVIEW: 0,
+      DISAGREE: 0,
+    };
+
+    comment.reactions.forEach((r: any) => {
+      (reactionCounts as any)[r.type]++;
+    });
+
+    if (!userHasReacted && !isOwner) {
+      // Hide counts if user hasn't participated and is not owner
+      comment['reactionCounts'] = null;
+    } else {
+      comment['reactionCounts'] = reactionCounts;
+    }
+
+    // Only return user's own reaction (or none)
+    comment['userReaction'] = currentUserId
+      ? comment.reactions.find((r: any) => r.userId === currentUserId) || null
+      : null;
+
+    // Do the same for replies
+    if (comment.replies) {
+      comment.replies = comment.replies.map((reply: any) =>
+        this.applyBlindVoting(reply, currentUserId),
+      );
+    }
+
+    delete comment.reactions; // Hide full list
+    return comment;
+  }
+
+  // ===== Mentions Helper =====
+  private extractMentions(content: string) {
+    // Regex matches @[Name](userId)
+    const mentionRegex = /@\[.*?\]\((.*?)\)/g;
+    const userIds = new Set<string>();
+    let match;
+
+    while ((match = mentionRegex.exec(content)) !== null) {
+      userIds.add(match[1]);
+    }
+
+    return Array.from(userIds);
+  }
+
+  private async notifyMentions(
+    commentId: string,
+    authorId: string,
+    mentionedUserIds: string[],
+  ) {
+    const author = await this.prisma.user.findUnique({
+      where: { id: authorId },
+    });
+
+    for (const userId of mentionedUserIds) {
+      if (userId !== authorId) {
+        // Create Mention Record
+        await this.prisma.commentMention
+          .create({
+            data: { commentId, userId },
+          })
+          .catch(() => {}); // Ignore duplicates
+
+        // Create Notification
+        await this.prisma.notification.create({
+          data: {
+            userId,
+            type: 'MENTION',
+            title: 'Seseorang menyebut Anda',
+            message: `${author?.name || 'Seseorang'} menyebut Anda dalam komentar.`,
+            link: `/community/comments/${commentId}`,
+          },
+        });
+      }
+    }
   }
 
   // ===== Comments =====
 
-  async addComment(postId: string, userId: string, content: string) {
+  async addComment(postId: string, userId: string, dto: CreateCommentDto) {
     const post = await this.prisma.communityPost.findUnique({
       where: { id: postId },
     });
@@ -137,19 +250,30 @@ export class CommunityService {
       throw new NotFoundException('Post tidak ditemukan');
     }
 
-    return this.prisma.comment.create({
+    const comment = await this.prisma.comment.create({
       data: {
         postId,
         userId,
-        content,
+        content: dto.content,
+        xPct: dto.xPct,
+        yPct: dto.yPct,
+        screenshotId: dto.screenshotId,
       },
       include: {
         user: { select: { id: true, name: true, avatar: true } },
       },
     });
+
+    // Handle mentions
+    const mentionedIds = this.extractMentions(dto.content);
+    if (mentionedIds.length > 0) {
+      await this.notifyMentions(comment.id, userId, mentionedIds);
+    }
+
+    return comment;
   }
 
-  async replyComment(commentId: string, userId: string, content: string) {
+  async replyComment(commentId: string, userId: string, dto: CreateCommentDto) {
     const parentComment = await this.prisma.comment.findUnique({
       where: { id: commentId },
     });
@@ -158,31 +282,43 @@ export class CommunityService {
       throw new NotFoundException('Komentar tidak ditemukan');
     }
 
-    return this.prisma.comment.create({
+    const comment = await this.prisma.comment.create({
       data: {
         postId: parentComment.postId,
         userId,
         parentCommentId: commentId,
-        content,
+        content: dto.content,
+        xPct: dto.xPct,
+        yPct: dto.yPct,
+        screenshotId: dto.screenshotId,
       },
       include: {
         user: { select: { id: true, name: true, avatar: true } },
       },
     });
+
+    // Handle mentions
+    const mentionedIds = this.extractMentions(dto.content);
+    if (mentionedIds.length > 0) {
+      await this.notifyMentions(comment.id, userId, mentionedIds);
+    }
+
+    return comment;
   }
 
-  // ===== Likes =====
+  // ===== Reactions =====
 
-  async toggleLike(commentId: string, userId: string) {
+  async reactToComment(commentId: string, userId: string, type: ReactionType) {
     const comment = await this.prisma.comment.findUnique({
       where: { id: commentId },
+      include: { user: true },
     });
 
     if (!comment) {
       throw new NotFoundException('Komentar tidak ditemukan');
     }
 
-    const existingLike = await this.prisma.like.findUnique({
+    const existingReaction = await this.prisma.reaction.findUnique({
       where: {
         userId_commentId: {
           userId,
@@ -191,17 +327,60 @@ export class CommunityService {
       },
     });
 
-    if (existingLike) {
-      await this.prisma.like.delete({
-        where: { id: existingLike.id },
-      });
-      return { liked: false, message: 'Like dihapus' };
+    if (existingReaction) {
+      if (existingReaction.type === type) {
+        // Toggle off
+        await this.prisma.reaction.delete({
+          where: { id: existingReaction.id },
+        });
+
+        // Remove reputation
+        await this.adjustReputation(comment.userId, type, -1);
+
+        return { reacted: false, type: null, message: 'Reaction dihapus' };
+      } else {
+        // Change reaction
+        await this.prisma.reaction.update({
+          where: { id: existingReaction.id },
+          data: { type },
+        });
+
+        // Adjust reputation (-old, +new)
+        await this.adjustReputation(comment.userId, existingReaction.type, -1);
+        await this.adjustReputation(comment.userId, type, 1);
+
+        return { reacted: true, type, message: 'Reaction diubah' };
+      }
     }
 
-    await this.prisma.like.create({
-      data: { userId, commentId },
+    // New reaction
+    await this.prisma.reaction.create({
+      data: { userId, commentId, type },
     });
 
-    return { liked: true, message: 'Like ditambahkan' };
+    // Add reputation
+    await this.adjustReputation(comment.userId, type, 1);
+
+    return { reacted: true, type, message: 'Reaction ditambahkan' };
+  }
+
+  private async adjustReputation(
+    userId: string,
+    type: ReactionType,
+    multiplier: number,
+  ) {
+    let scoreChange = 0;
+    if (type === 'AGREE') scoreChange = 5;
+    else if (type === 'DISAGREE') scoreChange = -1;
+    else if (type === 'NEEDS_REVIEW') scoreChange = 1;
+
+    if (scoreChange !== 0) {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          reputationScore: { increment: scoreChange * multiplier },
+        },
+      });
+    }
   }
 }

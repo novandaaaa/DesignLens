@@ -6,7 +6,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
-import ScrollFloat from '@/components/ScrollFloat';
+
 import AnimatedCounter from '@/components/AnimatedCounter';
 
 export default function DashboardPage() {
@@ -130,10 +130,12 @@ export default function DashboardPage() {
               </Link>
               <div className="h-6 w-px bg-[#F9F9FD]/10 hidden sm:block" />
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-[#8A2BE1]/20 border border-[#8A2BE1]/40 flex items-center justify-center text-[#8A2BE1] text-sm font-bold shadow-lg shadow-[#8A2BE1]/10">
-                  {user?.name?.charAt(0)?.toUpperCase()}
-                </div>
-                <span className="text-sm text-[#F9F9FD] font-medium hidden sm:block">{user?.name}</span>
+                <Link href={`/profile/${user?.id}`} className="cursor-target flex items-center gap-3 group/profile">
+                  <div className="w-9 h-9 rounded-xl bg-[#8A2BE1]/20 border border-[#8A2BE1]/40 flex items-center justify-center text-[#8A2BE1] text-sm font-bold shadow-lg shadow-[#8A2BE1]/10 group-hover/profile:border-[#8A2BE1] transition-all">
+                    {user?.name?.charAt(0)?.toUpperCase()}
+                  </div>
+                  <span className="text-sm text-[#F9F9FD] font-medium hidden sm:block group-hover/profile:text-white transition-colors">{user?.name}</span>
+                </Link>
                 <button
                   onClick={logout}
                   className="cursor-target text-xs text-[#F9F9FD]/50 hover:text-red-400 transition-colors ml-2"
@@ -156,7 +158,7 @@ export default function DashboardPage() {
               Selamat datang kembali, {user?.name?.split(' ')[0]}
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold text-[#F9F9FD] flex tracking-tight">
-              <ScrollFloat textClassName="text-[#F9F9FD]" stagger={0.03} animationDuration={1}>Dashboard</ScrollFloat>
+              Dashboard
             </h1>
             <p className="text-[#F9F9FD]/60 mt-3 text-lg">Kelola website dan lihat review Anda</p>
           </div>

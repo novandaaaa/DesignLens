@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
@@ -25,7 +25,7 @@ export default function HeroScrollAnimation() {
 
       const rect = outer.getBoundingClientRect();
       const scrollable = outer.offsetHeight - window.innerHeight;
-      // progress: 0 (top) -> 1 (bottom of scroll zone)
+      // progress: 0 (top) ΓåÆ 1 (bottom of scroll zone)
       const progress = Math.max(0, Math.min(1, -rect.top / scrollable));
 
       if (isDesktop) {
@@ -69,9 +69,9 @@ export default function HeroScrollAnimation() {
   }, [mounted]);
 
   return (
-    /* Outer — tall enough to give scroll room (250vh = 1.5× screen after sticky section) */
+    /* Outer ΓÇö tall enough to give scroll room (250vh = 1.5├ù screen after sticky section) */
     <div ref={outerRef} className="relative" style={{ height: '250vh' }}>
-      {/* Sticky inner — stays in viewport */}
+      {/* Sticky inner ΓÇö stays in viewport */}
       <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center pt-16 md:pt-20">
         <div className="relative w-full max-w-7xl mx-auto px-6 h-full flex items-center">
 
@@ -110,7 +110,7 @@ export default function HeroScrollAnimation() {
                 href="/register"
                 className="cursor-target group relative px-8 py-3.5 cyber-cut bg-[#8A2BE1] text-[#F9F9FD] font-bold text-lg hover:shadow-2xl hover:shadow-[#8A2BE1]/30 transition-all duration-500 hover:-translate-y-1"
               >
-                Mulai Evaluasi — Gratis
+                Mulai Evaluasi ΓÇö Gratis
                 <div className="absolute inset-0 cyber-cut bg-[#8A2BE1] opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl" />
               </Link>
               <a
@@ -130,15 +130,13 @@ export default function HeroScrollAnimation() {
           >
             <div className="glass-card p-3 rounded-2xl bg-white/5 border border-white/10 shadow-2xl shadow-[#8A2BE1]/20 transform md:rotate-2 hover:rotate-0 transition-transform duration-500">
               <div className="w-full aspect-video bg-[#0A0A0A] rounded-xl flex flex-col items-center justify-center border border-white/5 relative overflow-hidden">
-                <video 
-                  src="/klip_hero.mp4" 
-                  autoPlay 
-                  loop 
-                  muted 
-                  playsInline
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-black/50 bg-linear-to-tr from-[#8A2BE1]/40 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-linear-to-tr from-[#8A2BE1]/20 to-transparent" />
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white/30 mb-4">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                <span className="text-white/40 font-medium tracking-wide">Foto Placeholder</span>
               </div>
             </div>
           </div>

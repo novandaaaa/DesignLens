@@ -48,7 +48,7 @@ class ApiClient {
 
       return response.json();
     } catch (err) {
-      console.error('ApiClient fetch error:', `${this.baseUrl}/api${endpoint}`, err);
+      // Error logged or caught by caller
       throw err;
     }
   }
@@ -116,23 +116,44 @@ class ApiClient {
     return this.request<any>(`/community/posts/${postId}`);
   }
 
-  async addComment(postId: string, content: string) {
+  async addComment(postId: string, content: string, xPct?: number, yPct?: number, screenshotId?: string) {
     return this.request<any>(`/community/posts/${postId}/comments`, {
       method: 'POST',
-      body: { content },
+      body: { content, xPct, yPct, screenshotId },
     });
   }
 
-  async replyComment(commentId: string, content: string) {
+  async replyComment(commentId: string, content: string, xPct?: number, yPct?: number, screenshotId?: string) {
     return this.request<any>(`/community/comments/${commentId}/reply`, {
       method: 'POST',
-      body: { content },
+      body: { content, xPct, yPct, screenshotId },
     });
   }
 
-  async toggleLike(commentId: string) {
-    return this.request<any>(`/community/comments/${commentId}/like`, {
+  async reactToComment(commentId: string, type: 'AGREE' | 'NEEDS_REVIEW' | 'DISAGREE') {
+    return this.request<any>(`/community/comments/${commentId}/react`, {
       method: 'POST',
+      body: { type },
+    });
+  }
+
+  // Users
+  async searchUsers(query: string) {
+    return this.request<any[]>(`/users/search?q=${encodeURIComponent(query)}`);
+  }
+
+  async getUserProfile(userId: string) {
+    return this.request<any>(`/users/${userId}/profile`);
+  }
+
+  async getUserActivity(userId: string, type: 'comments' | 'websites' = 'comments') {
+    return this.request<any[]>(`/users/${userId}/activity?type=${type}`);
+  }
+
+  async updateProfile(data: FormData) {
+    return this.request<any>('/users/profile', {
+      method: 'PATCH',
+      body: data,
     });
   }
 }
