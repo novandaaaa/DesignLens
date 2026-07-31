@@ -27,7 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const loadUser = useCallback(async () => {
-    const token = localStorage.getItem('designlens_token');
+    const token = sessionStorage.getItem('designlens_token');
     if (!token) {
       setLoading(false);
       return;
@@ -37,7 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const profile = await api.getProfile();
       setUser(profile);
     } catch {
-      localStorage.removeItem('designlens_token');
+      sessionStorage.removeItem('designlens_token');
     } finally {
       setLoading(false);
     }
@@ -50,18 +50,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const res = await api.login({ email, password });
-    localStorage.setItem('designlens_token', res.accessToken);
+    sessionStorage.setItem('designlens_token', res.accessToken);
     setUser(res.user);
   };
 
   const register = async (name: string, email: string, password: string) => {
     const res = await api.register({ name, email, password });
-    localStorage.setItem('designlens_token', res.accessToken);
+    sessionStorage.setItem('designlens_token', res.accessToken);
     setUser(res.user);
   };
 
   const logout = () => {
-    localStorage.removeItem('designlens_token');
+    sessionStorage.removeItem('designlens_token');
     setUser(null);
   };
 

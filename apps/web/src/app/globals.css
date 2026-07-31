@@ -102,6 +102,7 @@
   --font-orbitron: var(--font-orbitron);
   --font-rajdhani: var(--font-orbitron);
   --font-exo2: var(--font-orbitron);
+  --font-inter: var(--font-inter);
   --font-mono: var(--font-mono);
 }
 
@@ -115,6 +116,10 @@ body {
 
 h1, h2, h3, h4, h5, h6, .font-orbitron {
   font-family: var(--font-orbitron), system-ui, sans-serif;
+}
+
+p, .font-inter {
+  font-family: var(--font-inter), system-ui, sans-serif;
 }
 
 .font-rajdhani, .nav-link, .secondary-title {
