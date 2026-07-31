@@ -1,4 +1,5 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const isServer = typeof window === 'undefined';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || (isServer ? 'http://localhost:4000' : '');
 
 interface RequestOptions {
   method?: string;
@@ -15,7 +16,7 @@ class ApiClient {
 
   private getToken(): string | null {
     if (typeof window === 'undefined') return null;
-    return localStorage.getItem('designlens_token');
+    return sessionStorage.getItem('designlens_token');
   }
 
   async request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {

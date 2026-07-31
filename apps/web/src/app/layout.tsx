@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Orbitron, Rajdhani, Exo_2 } from "next/font/google";
+import { Orbitron, Rajdhani, Exo_2, Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import TargetCursor from "@/components/TargetCursor";
@@ -23,6 +23,11 @@ const exo2 = Exo_2({
   subsets: ["latin"],
 });
 
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   title: "DesignLens AI — Platform Evaluasi UI/UX Website",
   description:
@@ -36,7 +41,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className={`${orbitron.variable} ${rajdhani.variable} ${exo2.variable} dark`}>
+    <html lang="id" className={`${orbitron.variable} ${rajdhani.variable} ${exo2.variable} ${inter.variable} dark`}>
       <body className="min-h-screen bg-transparent text-foreground font-sans antialiased">
         <SmoothScroll>
           <AuthProvider>

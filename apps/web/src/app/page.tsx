@@ -314,7 +314,7 @@ export default function LandingPage() {
               <button
                 onClick={runSimulation}
                 disabled={simulating}
-                className="cursor-target cursor-pointer inline-flex items-center gap-3 px-8 py-3.5 bg-white text-black font-semibold cyber-cut hover:bg-gray-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed mx-auto"
+                className="cursor-target cursor-pointer inline-flex items-center gap-3 px-8 py-3.5 bg-[#8A2BE1] text-[#F9F9FD] font-semibold cyber-cut hover:shadow-[0_0_20px_rgba(138,43,225,0.4)] transition-all duration-300 hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed mx-auto"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polygon points="5 3 19 12 5 21 5 3" />
@@ -581,11 +581,11 @@ export default function LandingPage() {
                 <div 
                   className="h-11 w-11 bg-[#8A2BE1] transition-transform duration-300 hover:scale-105 shrink-0"
                   style={{
-                    WebkitMaskImage: "url('apps\web\public\logo_DesignLens.png')",
+                    WebkitMaskImage: "url('/logo_DesignLens.png')",
                     WebkitMaskSize: "contain",
                     WebkitMaskRepeat: "no-repeat",
                     WebkitMaskPosition: "center",
-                    maskImage: "url('apps\web\public\logo_DesignLens.png')",
+                    maskImage: "url('/logo_DesignLens.png')",
                     maskSize: "contain",
                     maskRepeat: "no-repeat",
                     maskPosition: "center",
