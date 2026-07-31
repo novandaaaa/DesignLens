@@ -148,38 +148,40 @@ export default function DashboardPage() {
         </div>
       </nav>
 
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-6 pt-32 pb-20">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-12">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#8A2BE1]/30 bg-[#8A2BE1]/10 text-[#C5ABF2] text-xs font-medium mb-4 shadow-[0_0_15px_rgba(138,43,225,0.15)]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#8A2BE1] animate-pulse" />
-              Selamat datang kembali, {user?.name?.split(' ')[0]}
-            </div>
-            <h1 className="text-4xl sm:text-5xl font-bold text-[#F9F9FD] flex tracking-tight">
-              Dashboard
-            </h1>
-            <p className="text-[#F9F9FD]/60 mt-3 text-lg">Kelola website dan lihat review Anda</p>
-          </div>
-          <Link
-            href="/upload"
-            data-cursor-target="true"
-            className="cursor-target px-6 py-3 rounded-xl bg-[#8A2BE1] text-[#F9F9FD] font-semibold hover:shadow-lg hover:shadow-[#8A2BE1]/40 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            Upload Website
-          </Link>
+      {/* Transparent Hero Area */}
+      <div className="max-w-5xl mx-auto px-6 pt-32 pb-20 text-center relative z-10 flex flex-col items-center">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#8A2BE1]/30 bg-[#8A2BE1]/10 text-[#C5ABF2] text-xs font-medium mb-4 shadow-[0_0_15px_rgba(138,43,225,0.15)]">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#8A2BE1] animate-pulse" />
+          Selamat datang kembali, {user?.name?.split(' ')[0]}
         </div>
+        <h1 className="text-4xl md:text-5xl font-bold text-[#F9F9FD] flex justify-center mb-4 tracking-tight">
+          Dashboard
+        </h1>
+        <p className="text-[#F9F9FD]/60 text-lg mb-8">Kelola website dan lihat review Anda</p>
+        <Link
+          href="/upload"
+          data-cursor-target="true"
+          className="cursor-target px-8 py-3.5 rounded-xl bg-[#8A2BE1] text-[#F9F9FD] font-semibold hover:shadow-lg hover:shadow-[#8A2BE1]/40 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          Upload Website
+        </Link>
+      </div>
+
+      {/* Solid Background Content Area */}
+      <div className="flex-1 w-full bg-[#0A0A0A] border-t border-white/5 pt-12 pb-24 relative z-20 shadow-[0_-20px_50px_rgba(0,0,0,0.5)]">
+        <div className="max-w-6xl mx-auto px-6">
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
-          {stats.map((stat) => (
+        <div className="grid grid-cols-1 sm:grid-cols-3 rounded-3xl border border-white/10 overflow-hidden bg-white/5 backdrop-blur-md mb-12">
+          {stats.map((stat, index) => (
             <div
               key={stat.label}
-              className={`glass-card p-6 rounded-2xl flex items-center gap-5 border border-white/5 transition-all duration-300 group ${stat.glow} bg-white/5 backdrop-blur-xl hover:-translate-y-1`}
+              className={`p-6 flex items-center gap-5 transition-all duration-300 group ${stat.glow} hover:bg-white/10 ${
+                index !== stats.length - 1 ? 'border-b sm:border-b-0 sm:border-r border-white/10' : ''
+              }`}
             >
               <div
                 className={`w-14 h-14 rounded-xl ${stat.color} flex items-center justify-center text-white shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-lg`}
@@ -196,13 +198,7 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        {/* Section divider label */}
-        <div className="flex items-center gap-4 mb-6">
-          <h2 className="text-sm font-bold text-[#F9F9FD]/50 uppercase tracking-widest">
-            Website Anda
-          </h2>
-          <div className="h-px flex-1 bg-linear-to-r from-white/10 to-transparent" />
-        </div>
+
 
         {/* Websites List */}
         {loading ? (
@@ -234,13 +230,15 @@ export default function DashboardPage() {
             </Link>
           </div>
         ) : (
-          <div className="grid gap-4">
-            {safeWebsites.map((website) => (
+          <div className="flex flex-col rounded-3xl border border-white/10 overflow-hidden bg-white/5 backdrop-blur-md">
+            {safeWebsites.map((website, index) => (
               <Link
                 key={website.id}
                 href={`/review/${website.id}`}
                 data-cursor-target="true"
-                className="cursor-target glass-card p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center gap-5 border border-white/5 bg-white/5 hover:border-[#8A2BE1]/40 hover:bg-white/10 hover:shadow-[0_4px_20px_rgba(138,43,225,0.15)] hover:-translate-y-0.5 transition-all duration-300 group"
+                className={`cursor-target p-5 flex flex-col sm:flex-row sm:items-center gap-5 hover:bg-white/10 transition-colors group ${
+                  index !== safeWebsites.length - 1 ? 'border-b border-white/10' : ''
+                }`}
               >
                 {/* Visual Icon */}
                 <div className="w-12 h-12 rounded-xl bg-linear-to-br from-[#8A2BE1]/20 to-[#3E0E70]/50 border border-[#8A2BE1]/20 flex items-center justify-center shrink-0 text-[#C5ABF2] group-hover:scale-110 transition-transform duration-300">
@@ -302,6 +300,7 @@ export default function DashboardPage() {
             ))}
           </div>
         )}
+        </div>
       </div>
     </div>
   );

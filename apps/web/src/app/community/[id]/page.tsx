@@ -1,16 +1,18 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState, use, useCallback } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import ReactionPicker from '@/components/ReactionPicker';
 import MentionEditor from '@/components/MentionEditor';
 import ScreenshotAnnotator from '@/components/ScreenshotAnnotator';
+import Image from 'next/image';
 
 export default function CommunityPostPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
   const [post, setPost] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   
@@ -18,10 +20,18 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const router = useRouter();
   
   // Anchor Pin State
   const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
   const [newPin, setNewPin] = useState<{ xPct: number; yPct: number } | null>(null);
+
+  // Author Options State
+  const [showOptions, setShowOptions] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editData, setEditData] = useState({ title: '', description: '', targetAudience: '' });
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isUnpublishing, setIsUnpublishing] = useState(false);
 
   const loadPost = useCallback(async () => {
     try {
@@ -38,6 +48,46 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadPost();
   }, [loadPost]);
+
+  const isAuthor = user?.id && post?.website?.user?.id === user?.id;
+
+  const handleUpdatePost = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      await api.updateCommunityPost(id, editData);
+      setShowEditModal(false);
+      loadPost();
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleUnpublish = async () => {
+    if (!confirm('Yakin ingin membatalkan publikasi post ini? Website akan kembali ke Draft.')) return;
+    setIsUnpublishing(true);
+    try {
+      await api.unpublishCommunityPost(id);
+      router.push('/dashboard');
+    } catch (err: any) {
+      alert(err.message);
+      setIsUnpublishing(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!confirm('Yakin ingin menghapus post ini dari komunitas secara permanen?')) return;
+    setIsDeleting(true);
+    try {
+      await api.deleteCommunityPost(id);
+      router.push('/dashboard');
+    } catch (err: any) {
+      alert(err.message);
+      setIsDeleting(false);
+    }
+  };
 
   const handleAddPin = (xPct: number, yPct: number) => {
     setNewPin({ xPct, yPct });
@@ -119,39 +169,58 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
   const screenshotUrl = post.website?.screenshots?.[0]?.fileUrl;
 
   return (
-    <div className="min-h-screen">
-      <nav className="border-b border-white/5 bg-surface-0/80 backdrop-blur-xl sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" data-cursor-target="true" className="cursor-target flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#8A2BE1] flex items-center justify-center">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-              </svg>
-            </div>
-            <span className="text-lg font-bold text-white">
-              Design<span className="text-[#8A2BE1]">Lens</span>
-            </span>
-          </Link>
+    <div className="min-h-screen bg-[#0A0A0A] relative z-10 flex flex-col">
+      <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-6xl transition-all duration-500">
+        <div className="mx-auto px-6 py-3.5 rounded-2xl backdrop-blur-2xl border border-[#F9F9FD]/10 bg-[#0A0A0A]/60 shadow-2xl shadow-black/50">
+          <div className="flex items-center justify-between gap-6">
+            <Link href="/" data-cursor-target="true" className="cursor-target flex items-center gap-3 group shrink-0">
+              <Image 
+                src="/logo_DesignLens.png" 
+                alt="DesignLens Logo"
+                width={40}
+                height={40}
+                className="object-contain transition-transform duration-300 group-hover:scale-110 shrink-0 mix-blend-screen"
+                priority
+              />
+              <span className="text-2xl font-bold text-[#8A2BE1] hidden sm:block">DesignLens</span>
+            </Link>
 
-          <div className="flex items-center gap-4">
-            {isAuthenticated ? (
-              <Link href="/dashboard" data-cursor-target="true" className="cursor-target text-sm text-white/60 hover:text-white transition-colors">
+            <div className="flex items-center gap-4 shrink-0">
+              <Link href="/dashboard" data-cursor-target="true" className="cursor-target text-sm text-[#F9F9FD]/70 hover:text-[#F9F9FD] transition-colors hidden sm:block">
                 Dashboard
               </Link>
-            ) : (
-              <Link
-                href="/login"
-                className="px-4 py-2 cyber-cut bg-[#8A2BE1] text-white text-sm font-medium"
-              >
-                Masuk
-              </Link>
-            )}
+              {isAuthenticated ? (
+                <>
+                  <div className="h-6 w-px bg-[#F9F9FD]/10 hidden sm:block" />
+                  <div className="flex items-center gap-3">
+                    <Link href={`/profile/${user?.id}`} className="cursor-target flex items-center gap-3 group/profile">
+                      <div className="w-9 h-9 rounded-xl bg-[#8A2BE1]/20 border border-[#8A2BE1]/40 flex items-center justify-center text-[#8A2BE1] text-sm font-bold shadow-lg shadow-[#8A2BE1]/10 group-hover/profile:border-[#8A2BE1] transition-all">
+                        {user?.name?.charAt(0)?.toUpperCase()}
+                      </div>
+                      <span className="text-sm text-[#F9F9FD] font-medium hidden sm:block group-hover/profile:text-white transition-colors">{user?.name}</span>
+                    </Link>
+                    <button
+                      onClick={logout}
+                      className="cursor-target text-xs text-[#F9F9FD]/50 hover:text-red-400 transition-colors ml-2"
+                    >
+                      Keluar
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <Link
+                  href="/login"
+                  className="px-4 py-2 cyber-cut bg-[#8A2BE1] text-[#F9F9FD] text-sm font-medium hover:-translate-y-0.5 transition-transform"
+                >
+                  Masuk
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col lg:flex-row gap-8">
+      <div className="max-w-7xl mx-auto w-full px-6 pt-32 pb-24 flex flex-col lg:flex-row gap-8">
         {/* Left Side: Screenshot & Details */}
         <div className="flex-1">
           <Link href="/community" data-cursor-target="true" className="cursor-target inline-flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors mb-6 text-sm">
@@ -163,20 +232,64 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
 
           {/* Post Header */}
           <div className="glass-card p-6 mb-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 cyber-cut-sm bg-[#8A2BE1] flex items-center justify-center text-white text-sm font-bold">
-                {post.website?.user?.name?.charAt(0)?.toUpperCase()}
-              </div>
-              <div>
-                <Link href={`/profile/${post.website?.user?.id}`} className="font-medium text-text-primary hover:underline">
-                  {post.website?.user?.name}
-                </Link>
-                <div className="text-xs text-text-tertiary">
-                  {new Date(post.publishedAt).toLocaleDateString('id-ID', {
-                    year: 'numeric', month: 'long', day: 'numeric',
-                  })}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 cyber-cut-sm bg-[#8A2BE1] flex items-center justify-center text-white text-sm font-bold">
+                  {post.website?.user?.name?.charAt(0)?.toUpperCase()}
+                </div>
+                <div>
+                  <Link href={`/profile/${post.website?.user?.id}`} className="font-medium text-text-primary hover:underline">
+                    {post.website?.user?.name}
+                  </Link>
+                  <div className="text-xs text-text-tertiary">
+                    {new Date(post.publishedAt).toLocaleDateString('id-ID', {
+                      year: 'numeric', month: 'long', day: 'numeric',
+                    })}
+                  </div>
                 </div>
               </div>
+              
+              {isAuthor && (
+                <div className="relative">
+                  <button 
+                    onClick={() => setShowOptions(!showOptions)}
+                    className="p-2 text-text-secondary hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="1" />
+                      <circle cx="12" cy="5" r="1" />
+                      <circle cx="12" cy="19" r="1" />
+                    </svg>
+                  </button>
+                  {showOptions && (
+                    <div className="absolute right-0 mt-2 w-48 bg-[#1A1A1A] border border-white/10 rounded-xl shadow-xl z-20 overflow-hidden">
+                      <button 
+                        onClick={() => { setShowOptions(false); setEditData({ title: post.website.title, description: post.website.description || '', targetAudience: post.website.targetAudience || '' }); setShowEditModal(true); }}
+                        className="w-full text-left px-4 py-3 text-sm text-[#F9F9FD] hover:bg-white/5 transition-colors flex items-center gap-2"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        Edit Post
+                      </button>
+                      <button 
+                        onClick={() => { setShowOptions(false); handleUnpublish(); }}
+                        disabled={isUnpublishing}
+                        className="w-full text-left px-4 py-3 text-sm text-yellow-400 hover:bg-white/5 transition-colors flex items-center gap-2"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 3l18 18M10.584 10.587a2 2 0 002.828 2.83M17 17H5a2 2 0 01-2-2V7a2 2 0 011.5-1.921M15 5h2a2 2 0 012 2v6.5"/></svg>
+                        Tarik dari Komunitas
+                      </button>
+                      <button 
+                        onClick={() => { setShowOptions(false); handleDelete(); }}
+                        disabled={isDeleting}
+                        className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-white/5 transition-colors flex items-center gap-2"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        Hapus Post
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <h1 className="text-2xl font-bold text-text-primary mb-2">{post.website?.title}</h1>
@@ -350,6 +463,96 @@ export default function CommunityPostPage({ params }: { params: Promise<{ id: st
           </div>
         </div>
       </div>
+
+      {/* AI Review Results */}
+      {post.website?.aiReview && post.website.aiReview.status === 'COMPLETED' && (
+        <div className="max-w-7xl mx-auto px-6 pb-20 mt-8">
+          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+            <span className="text-3xl">🤖</span>
+            Hasil AI Review
+          </h2>
+          <div className="space-y-6">
+            <div className="p-8 rounded-3xl border border-white/5 bg-white/5 backdrop-blur-xl shadow-2xl flex flex-col sm:flex-row items-center gap-8">
+              <div className="relative shrink-0">
+                <svg width="120" height="120" className="-rotate-90">
+                  <circle cx="60" cy="60" r="56" fill="none" stroke="currentColor" strokeWidth="6" className="text-white/10" />
+                  <circle
+                    cx="60" cy="60" r="56" fill="none" 
+                    stroke={post.website.aiReview.overallScore >= 80 ? '#10b981' : post.website.aiReview.overallScore >= 60 ? '#f59e0b' : '#ef4444'} 
+                    strokeWidth="6"
+                    strokeDasharray={2 * Math.PI * 56} 
+                    strokeDashoffset={(2 * Math.PI * 56) - ((post.website.aiReview.overallScore ?? 0) / 100) * (2 * Math.PI * 56)} 
+                    strokeLinecap="round"
+                    className="transition-all duration-1000"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-4xl font-bold text-white">{post.website.aiReview.overallScore}</span>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-white mb-2">Overall Score</h3>
+                <p className="text-white/70 text-base">
+                  {post.website.aiReview.overallScore >= 80 ? 'Desain website Anda sudah sangat baik! 🎉' :
+                   post.website.aiReview.overallScore >= 60 ? 'Cukup baik, ada beberapa area yang bisa ditingkatkan.' :
+                   'Masih ada banyak ruang untuk perbaikan.'}
+                </p>
+                <p className="text-xs text-white/40 mt-3 font-mono">Model: {post.website.aiReview.modelUsed}</p>
+              </div>
+            </div>
+
+            {post.website.aiReview.recommendation && (
+              <div className="p-6 rounded-2xl border border-white/5 bg-[#8A2BE1]/10 backdrop-blur-xl">
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-xl">💡</span>
+                  <h4 className="font-bold text-white text-lg">Rekomendasi Utama</h4>
+                </div>
+                <p className="text-white/80 leading-relaxed">{post.website.aiReview.recommendation}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      
+      {/* Edit Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-[#111] border border-white/10 rounded-2xl p-6 w-full max-w-lg shadow-2xl relative">
+            <button onClick={() => setShowEditModal(false)} className="absolute top-4 right-4 text-white/50 hover:text-white">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <h2 className="text-xl font-bold text-white mb-6">Edit Postingan Komunitas</h2>
+            <form onSubmit={handleUpdatePost} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-white/70 mb-1">Judul Website</label>
+                <input 
+                  type="text" 
+                  value={editData.title} 
+                  onChange={(e) => setEditData({...editData, title: e.target.value})}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#8A2BE1]" 
+                  required 
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-white/70 mb-1">Deskripsi</label>
+                <textarea 
+                  value={editData.description} 
+                  onChange={(e) => setEditData({...editData, description: e.target.value})}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#8A2BE1] h-32 resize-none" 
+                />
+              </div>
+              <div className="pt-2 flex justify-end gap-3">
+                <button type="button" onClick={() => setShowEditModal(false)} className="px-4 py-2 rounded-lg text-white/70 hover:text-white hover:bg-white/5 transition-colors">
+                  Batal
+                </button>
+                <button type="submit" disabled={submitting} className="px-6 py-2 rounded-lg bg-[#8A2BE1] text-white hover:bg-[#8A2BE1]/90 disabled:opacity-50 transition-colors">
+                  {submitting ? 'Menyimpan...' : 'Simpan Perubahan'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

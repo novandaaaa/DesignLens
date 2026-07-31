@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
@@ -39,16 +40,16 @@ export default function RegisterPage() {
 
       <div className="w-full max-w-md">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 justify-center mb-8">
-          <div className="w-10 h-10 cyber-cut bg-[#c1f02a] flex items-center justify-center">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="3" />
-              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-            </svg>
-          </div>
-          <span className="text-xl font-bold text-text-primary">
-            Design<span className="text-[#8A2BE1]">Lens</span>
-          </span>
+        <Link href="/" className="cursor-target flex items-center gap-3 justify-center mb-8 group shrink-0">
+          <Image 
+            src="/logo_DesignLens.png" 
+            alt="DesignLens Logo"
+            width={40}
+            height={40}
+            className="object-contain transition-transform duration-300 group-hover:scale-110 shrink-0 mix-blend-screen"
+            priority
+          />
+          <span className="text-2xl font-bold text-[#8A2BE1]">DesignLens</span>
         </Link>
 
         {/* Card */}
