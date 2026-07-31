@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback, useMemo } from 'react';
+import {useEffect,useRef,useCallback,useMemo,useState,type ReactNode,} from 'react';
 import { gsap } from 'gsap';
 import './TargetCursor.css';
 
